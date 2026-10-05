@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{BFEA69B2-0E07-4DD2-9A7B-5BB32E4F0B01}</UniqueIdentifier>
+      <Extensions>asm</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{BFEA69B2-0E07-4DD2-9A7B-5BB32E4F0B02}</UniqueIdentifier>
+      <Extensions>inc</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Shared">
+      <UniqueIdentifier>{BFEA69B2-0E07-4DD2-9A7B-5BB32E4F0B03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Anas">
+      <UniqueIdentifier>{BFEA69B2-0E07-4DD2-9A7B-5BB32E4F0B04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Alyan">
+      <UniqueIdentifier>{BFEA69B2-0E07-4DD2-9A7B-5BB32E4F0B05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Ali">
+      <UniqueIdentifier>{BFEA69B2-0E07-4DD2-9A7B-5BB32E4F0B06}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="src\game.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shared\constants.inc"><Filter>Header Files\Shared</Filter></None>
+    <None Include="src\shared\data.inc"><Filter>Header Files\Shared</Filter></None>
+    <None Include="src\anas\input.inc"><Filter>Header Files\Anas</Filter></None>
+    <None Include="src\anas\torpedo.inc"><Filter>Header Files\Anas</Filter></None>
+    <None Include="src\anas\collision.inc"><Filter>Header Files\Anas</Filter></None>
+    <None Include="src\anas\stubs_anas.inc"><Filter>Header Files\Anas</Filter></None>
+    <None Include="src\alyan\render.inc"><Filter>Header Files\Alyan</Filter></None>
+    <None Include="src\alyan\hud.inc"><Filter>Header Files\Alyan</Filter></None>
+    <None Include="src\alyan\explosion.inc"><Filter>Header Files\Alyan</Filter></None>
+    <None Include="src\alyan\sonar.inc"><Filter>Header Files\Alyan</Filter></None>
+    <None Include="src\alyan\stubs_alyan.inc"><Filter>Header Files\Alyan</Filter></None>
+    <None Include="src\ali\random.inc"><Filter>Header Files\Ali</Filter></None>
+    <None Include="src\ali\screens.inc"><Filter>Header Files\Ali</Filter></None>
+    <None Include="src\ali\charges.inc"><Filter>Header Files\Ali</Filter></None>
+    <None Include="src\ali\sound.inc"><Filter>Header Files\Ali</Filter></None>
+    <None Include="src\ali\score.inc"><Filter>Header Files\Ali</Filter></None>
+    <None Include="src\ali\highscore.inc"><Filter>Header Files\Ali</Filter></None>
+    <None Include="src\ali\stubs_ali.inc"><Filter>Header Files\Ali</Filter></None>
+  </ItemGroup>
+</Project>

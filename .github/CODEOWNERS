@@ -1,0 +1,15 @@
+# Initial owner for the leader-maintained project/shared files.
+/src/game.asm @muhammadanas20
+/src/shared/ @muhammadanas20
+/src/anas/ @muhammadanas20
+/docs/progress/anas.md @muhammadanas20
+/docs/report/anas.md @muhammadanas20
+
+# Add the members' real GitHub handles after collaborator invitations are accepted.
+# Example (replace with the actual handles; do not leave placeholders active):
+# /src/alyan/ @alyan-handle
+# /docs/progress/alyan.md @alyan-handle
+# /docs/report/alyan.md @alyan-handle
+# /src/ali/ @ali-handle
+# /docs/progress/ali.md @ali-handle
+# /docs/report/ali.md @ali-handle
