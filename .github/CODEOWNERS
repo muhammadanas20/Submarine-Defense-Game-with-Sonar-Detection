@@ -7,9 +7,9 @@
 
 # Add the members' real GitHub handles after collaborator invitations are accepted.
 # Example (replace with the actual handles; do not leave placeholders active):
-# /src/alyan/ @alyan-handle
-# /docs/progress/alyan.md @alyan-handle
-# /docs/report/alyan.md @alyan-handle
-# /src/ali/ @ali-handle
-# /docs/progress/ali.md @ali-handle
-# /docs/report/ali.md @ali-handle
+# /src/alyan/ @syedalyan18
+# /docs/progress/alyan.md @syedalyan18 
+# /docs/report/alyan.md @syedalyan18 
+# /src/ali/ @k250827-lgtm
+# /docs/progress/ali.md @k250827-lgtm
+# /docs/report/ali.md @k250827-lgtm
