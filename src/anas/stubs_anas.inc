@@ -1,5 +1,7 @@
 ; Temporary Anas procedures for incremental integration.
-; Delete a matching ANAS_STUB invocation when the real PROC is implemented.
+; All four Anas procedures (HandleInput, FireTorpedo, UpdateTorpedoes,
+; CheckCollisions) are now implemented in input.inc, torpedo.inc, and
+; collision.inc, so their ANAS_STUB lines have been removed.
 ANAS_STUB MACRO procName
     procName PROC
         ret
@@ -7,9 +9,5 @@ ANAS_STUB MACRO procName
 ENDM
 
 .code
-ANAS_STUB HandleInput
-ANAS_STUB FireTorpedo
-ANAS_STUB UpdateTorpedoes
-ANAS_STUB CheckCollisions
 
 PURGE ANAS_STUB
