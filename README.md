@@ -87,9 +87,6 @@ Stub procedures are declared in `src/<owner>/stubs_<owner>.inc`. When a real pro
 | M4 / v1.0 | 22 Nov 2026 | Lab-PC test checklist passed; report ready for demo |
 | Demo | 23 Nov 2026 | Individual viva and project demonstration |
 
-## AI-use disclosure
-
-The course guide requires AI assistance to be disclosed in the final report. This initial repository scaffold and some documentation were AI-assisted. Review, adapt, understand, and test every source file; keep the disclosure in the final report accurate to the work actually used. A draft disclosure is in `docs/report/anas.md`.
 
 ## Gameplay target (planned)
 
