@@ -1,6 +1,6 @@
 # Project proposal outline — Depth Charge
 
-**Status:** Completed outline aligned with `docs/proposal/COAL project proposal.pdf` (submitted 15 October 2026).
+**Status:** Completed outline aligned with `docs/proposal/COAL project proposal.pdf` (submitted 15 October 2026). The game modules are now integrated; see [implementation notes](implementation-notes.md) for small, explicit decisions and the [verification record](../testing/verification-2026-11-03.md) for what was actually tested.
 
 ## Cover information
 

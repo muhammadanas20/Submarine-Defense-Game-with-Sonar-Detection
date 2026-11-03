@@ -1,93 +1,152 @@
 # Depth Charge — Submarine Defense with Sonar Detection
 
-A text-mode, 80 × 25 submarine defense game for the **EL-2003 Computer Organization and Assembly Language Lab**, Fall 2026 (BCS-3C). The project is organized for three members to work in parallel, following the attached Anas implementation guide.
+A simple, single-player **80 × 25 text-console game** written in **x86 assembly (MASM + Irvine32)** for EL-2003 Computer Organization and Assembly Language Lab, Fall 2026.
 
-> **Starter state:** this is the Week 0 / A1 repository scaffold. `src/game.asm` is a small Irvine32 smoke-test program; it is not yet the finished game. The `stubs_*.inc` files keep planned procedures available while the team implements each module. Replace the smoke-test `main` as work proceeds through A2–A8.
+**Status:** the proposed game modules are implemented and integrated. The code has been assembled, linked, and exercised in a Windows compatibility environment. Final Visual Studio/lab-PC acceptance and individual member review are still required. See [Verification](docs/testing/verification-2026-11-03.md).
 
 ## Team and course
 
-- **Group leader:** Muhammad Anas (25K-0899)
-- **Member 2:** Syed Alyan Hussain (25K-0648)
-- **Member 3:** Ali Raza (25K-0827)
-- **Instructor:** Muhammad Owais
-- **Course:** EL-2003 COAL Lab, Fall 2026
-- **Planned demo:** Monday, 23 November 2026
-- **Repository:** <https://github.com/muhammadanas20/Submarine-Defense-Game-with-Sonar-Detection>
+| Role | Name | Roll number | Main responsibility |
+|---|---|---|---|
+| Group leader | Muhammad Anas | 25K-0899 | Loop, input, submarine, torpedoes, collisions, integration |
+| Member 2 | Syed Alyan Hussain | 25K-0648 | Drawing, HUD, explosions, sonar |
+| Member 3 | Ali Raza | 25K-0827 | Random numbers, charges, screens, score, sound, high score |
 
-## Repository layout
+- **Course:** EL-2003 COAL Lab, BCS-3C, FAST-NUCES Karachi
+- **Instructor:** Mr. Muhammad Owais
+- **Proposal:** [PDF](docs/proposal/COAL%20project%20proposal.pdf) · [Outline and implementation notes](docs/proposal/proposal-outline.md)
+- **Planned demo:** 23 November 2026, subject to the instructor's schedule
+
+## How to play
+
+You control the green submarine `U` near the bottom of the screen. Avoid falling depth charges `*` and shoot them with torpedoes `^`. Some charges are hidden mines: they are real objects in memory but are not drawn during normal play. Sonar reveals them as green `!` marks.
+
+| Key | Action |
+|---|---|
+| `A` / `D` or Left / Right | Move left / right; capital letters also work |
+| `W` | Fire a torpedo |
+| `SPACE` | Activate sonar when ready |
+| `P` | Pause / resume, including during sonar |
+| `ESC` | Return to the menu without saving the current round |
+| Menu `1` / `2` / `3` | Start / instructions / exit |
+
+Rules:
+
+- 3 lives; a charge hitting the submarine costs one life.
+- Visible charge: **+10** points. Hidden mine: **+25** points.
+- Level increases every 200 points, up to level 9.
+- Higher levels use shorter spawn and fall delays.
+- Sonar freezes object movement for about 2 seconds, then recharges for 10 seconds.
+- A new high score is saved at **game over**, not when leaving with `ESC`.
+- After game over, press any key to return to the menu.
+
+The frame target is 80 ms (about 12.5 frames/second). Blocking Windows `Beep` calls can make an individual frame longer; this is a simple course project, not a hard real-time engine.
+
+## Build and run on Windows
+
+### Requirements
+
+1. Windows 10/11.
+2. Visual Studio 2022 with **Desktop development with C++** and MASM build customizations.
+3. The course's **32-bit Irvine32** package in `C:\Irvine`, including:
+   - `Irvine32.inc`, `SmallWin.inc`, `VirtualKeys.inc`
+   - `Irvine32.lib`, `Kernel32.lib`, `User32.lib`
+4. A console window/buffer of at least 80 columns and 25 rows. The game draws an 80 × 25 area.
+
+### Steps
+
+1. Clone or download this repository.
+2. Open **`Project.sln`** in Visual Studio 2022.
+3. Select **Debug | Win32** or **Release | Win32**. Do not select x64.
+4. Build with **Ctrl+Shift+B**.
+5. Run with **Ctrl+F5**.
+6. The executable is created at `bin\Win32\Debug\DepthCharge.exe` or `bin\Win32\Release\DepthCharge.exe`.
+
+The project already sets the MASM include path, Irvine library path, entry point `main`, and disables SafeEH for the legacy assembly objects. If the instructor's Irvine folder is different, change the two `C:\Irvine` paths in the project properties for the selected configuration.
+
+### If the build fails
+
+| Message / symptom | Check |
+|---|---|
+| Cannot open `Irvine32.inc` | MASM → General → Include Paths must contain the Irvine folder and `$(ProjectDir)src` |
+| Cannot open `Irvine32.lib` | Linker → General → Additional Library Directories must contain the Irvine folder |
+| Unresolved external symbol | Confirm Win32, the correct Irvine library, and `kernel32.lib;user32.lib` |
+| SafeEH error | Linker → Advanced → Image Has Safe Exception Handlers = **No** |
+| Entry-point error | Linker → Advanced → Entry Point = **main** |
+| Game area is cut off | Enlarge the console window/buffer to at least 80 × 25 |
+| No sound | Check Windows volume and output device; muted sound does not stop gameplay |
+
+`highscore.dat` is a small binary file created in the program's **current working directory**. With the supplied Visual Studio project this is normally the project folder. It is ignored by Git. If saving fails, the game-over screen shows a permission message.
+
+## Source layout
 
 ```text
-Submarine-Defense-Game-with-Sonar-Detection/
-├── .github/
-│   ├── CODEOWNERS
-│   └── PULL_REQUEST_TEMPLATE.md
-├── docs/
-│   ├── guides/                 Attached implementation guide
-│   ├── progress/               Per-member weekly logs
-│   ├── proposal/               Proposal outline
-│   ├── report/                 Per-member final-report sections
-│   └── testing/                Acceptance checklist
-├── src/
-│   ├── game.asm                The only assembly entry point
-│   ├── shared/                 Shared constants and game data
-│   ├── anas/                   Loop, input, torpedoes, collisions
-│   ├── alyan/                  Rendering, HUD, explosions, sonar
-│   └── ali/                    Random, menus, charges, sound, score, save file
-├── Project.sln                 Visual Studio 2022 solution (Win32 / x86)
-├── Project.vcxproj             MASM project; expects Irvine32 at C:\Irvine
-└── Project.vcxproj.filters     Solution Explorer grouping
+src/
+├── game.asm                 Main, InitGame, GameLoop, FrameDelay, INCLUDE list
+├── shared/
+│   ├── constants.inc        Screen sizes, states, colours, object limits
+│   └── data.inc             GameObject structure and shared variables/arrays
+├── anas/
+│   ├── input.inc            Non-blocking keys, movement, pause, sonar request
+│   ├── torpedo.inc          Fire and move torpedoes
+│   └── collision.inc        Torpedo/charge and charge/submarine hits
+├── alyan/
+│   ├── render.inc           Console setup, screen buffers, changed-cell drawing
+│   ├── hud.inc              Score/lives/level/sonar status and pause message
+│   ├── explosion.inc        Five-frame ASCII explosion
+│   └── sonar.inc            Two-second reveal and ten-second recharge
+└── ali/
+    ├── random.inc           Small linear congruential generator
+    ├── screens.inc          Menu, instructions, game over
+    ├── charges.inc          Spawn and fall logic
+    ├── sound.inc            Five Beep sound effects and one small macro
+    ├── score.inc            Points, lives, level lookup tables
+    └── highscore.inc        Four-byte high-score file
 ```
 
-## Build requirements
+There is **one assembly translation unit**: `game.asm` includes the `.inc` files. The old temporary stub files have been removed because all planned procedures now have real implementations.
 
-This project is for **Windows**, not a Linux assembler. You need:
+## Documentation for submission and viva
 
-1. Visual Studio 2022 with **Desktop development with C++** and the **MASM build customization** installed.
-2. The course Irvine32 files/library in `C:\Irvine` (`Irvine32.inc`, `Irvine32.lib`, and required support files).
-3. An x86/Win32 build configuration. Irvine32 is a 32-bit library.
+- [Common viva guide: how the whole game works](docs/viva/00-common.md)
+- [Anas's viva guide](docs/viva/anas.md)
+- [Alyan's viva guide](docs/viva/alyan.md)
+- [Ali's viva guide](docs/viva/ali.md)
+- [IEEE-style team report draft](docs/report/final-report.md) — review and personalize before submission
+- [Manual acceptance checklist](docs/testing/acceptance-checklist.md)
+- [Actual verification record](docs/testing/verification-2026-11-03.md)
+- [Contribution and PR rules](CONTRIBUTING.md)
 
-### Build the Week 0 scaffold
+### Word / PDF copies
 
-1. Open `Project.sln` in Visual Studio.
-2. Select **Debug | Win32** (or **Release | Win32**).
-3. Build the solution, then run it. The starter should print:
-   `Depth Charge skeleton builds and runs OK`
-4. If your lab uses a different Irvine folder, update the MASM include path and linker library path locally. Coordinate with the group before committing project-file changes; the plan asks members not to commit changes to `Project.*` after initial setup.
+Generated copies are in [`docs/submission/`](docs/submission/):
 
-The project files are supplied as a VS2022-compatible starting point because no Irvine/Visual Studio template was included with the guide. Confirm the project settings against your instructor's lab template before relying on them. This workspace cannot run the Windows Irvine32 build, so the scaffold has **not** been assembled or runtime-tested here.
+- [Team report draft (PDF)](docs/submission/Depth_Charge_Report_Draft.pdf) · [DOCX](docs/submission/Depth_Charge_Report_Draft.docx)
+- [Combined viva guide (PDF)](docs/submission/Depth_Charge_Viva_Guide.pdf) · [DOCX](docs/submission/Depth_Charge_Viva_Guide.docx)
+- Individual viva PDFs: [Anas](docs/submission/Viva_Guide_Anas.pdf), [Alyan](docs/submission/Viva_Guide_Alyan.pdf), [Ali](docs/submission/Viva_Guide_Ali.pdf)
 
-## Module ownership and integration contract
+The course outline requires a written report and individual viva. The report draft is a team starting point, not proof that every member has reviewed the code. Each member must understand their own module and the common game loop, run the demo, and follow the instructor's individual-report instructions.
 
-| Area | Owner | Main files |
-|---|---|---|
-| Main loop, frame timing, input, submarine, torpedoes, collisions, integration | Anas | `src/game.asm`, `src/anas/`, `src/shared/` |
-| Drawing, HUD, explosions, sonar | Alyan | `src/alyan/` |
-| Random numbers, menu, charges, sound, score, high score | Ali | `src/ali/` |
+## Deliberately simple design
 
-`src/shared/constants.inc` and `src/shared/data.inc` are shared contracts. Discuss changes with all members; Anas maintains these files. Each person edits their own module folder and their own `docs/progress/<name>.md` / `docs/report/<name>.md`.
+- Fixed arrays: 8 torpedoes, 15 charges, 5 explosions.
+- One four-byte `GameObject` structure for all three object types.
+- Short procedures with comments and predictable register inputs/outputs.
+- Two screen buffers; only changed cells are sent to the console.
+- Ordinary `CMP`/conditional jumps instead of an optional optimized renderer.
+- Simple lookup tables for nine levels.
+- One small sound macro; no audio files, graphics library, mouse, networking, or saved games.
 
-Stub procedures are declared in `src/<owner>/stubs_<owner>.inc`. When a real procedure is implemented, remove **only that procedure's** `*_STUB` line from the corresponding stub file to avoid duplicate definitions. Keep the remaining stubs until their real implementations are ready.
+The optional `RenderFast` / `REPE CMPSW` upgrade from the guide is **not** included. Recursion, inline assembly, and extended arithmetic are also not forced into the game because the proposal does not need them. The viva guide maps the concepts actually used to the course outline.
 
-## Git workflow
+## Verification summary
 
-- Week 0: push the initial starter structure to `main` once.
-- Thereafter: create one branch per week's work, commit small buildable changes, and open a pull request.
-- Suggested branch: `week1-anas`; suggested PR title: `Week 1 – Anas – A2 A3`.
-- Review each PR's changed files; merge in the order Anas → Alyan → Ali, then build and play before announcing that the group can sync.
-- **Do not use `git add .` for weekly work.** Stage only your own paths. The one-time Week 0 initial commit is the exception in the guide.
-- See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the attached guide for the detailed commands and schedule.
+On 3 November 2026 the production source was assembled with Microsoft MASM 6.14, linked as a PE32 Windows console executable with LLVM `lld-link`, and run under Wine 10.0. A separate assembly validation harness passed **1,090 checks** against the real game procedures. Menu/gameplay/pause were also exercised in a console.
 
-## Milestones
+This is **not** a claim of a Visual Studio 2022 build, native Windows lab-PC test, audible speaker test, or ten-minute lab soak test. Those remain on the acceptance checklist.
 
-| Milestone | Date | Whole-game target |
-|---|---:|---|
-| M1 | 25 Oct 2026 | Program/menu run; submarine moves without flicker; random numbers work |
-| M2 | 8 Nov 2026 | Playable core: torpedoes, charges, hits, explosions, score, lives, HUD |
-| M3 | 18 Nov 2026 | Sonar/mines, sound, levels, pause, high score, game-over screen |
-| M4 / v1.0 | 22 Nov 2026 | Lab-PC test checklist passed; report ready for demo |
-| Demo | 23 Nov 2026 | Individual viva and project demonstration |
+## Academic integrity and AI disclosure
 
+This integration used AI assistance to complete and review code and prepare documentation, following the repository's existing AI-assisted proposal/guides. The simple implementation is intended for study and adaptation. Members must review every procedure they present, disclose AI use as required by the instructor, and never claim unreviewed generated work as unaided individual work.
 
-## Gameplay target (planned)
-
-The final game is a state-driven Irvine32 console game with an 80 × 25 screen. Planned controls: **A/D** or **←/→** to move, **W** to fire, **SPACE** for sonar, **P** to pause, and **ESC** to return to the menu. See `docs/testing/acceptance-checklist.md` for the test targets.
+Do not commit access tokens, personal Visual Studio files, build output, or `highscore.dat`.
