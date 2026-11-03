@@ -1,20 +1,27 @@
-# Weekly progress — Syed Alyan Hussain (25K-0648)
+# Progress — Syed Alyan Hussain (25K-0648)
 
-Update this file before each weekly PR. Record actual work and test results; coordinate module contracts with the team.
+Historical weekly entries were not recorded in this file. The table below records the integration work actually present in the completion PR; it does not invent weekly history.
 
-| Week | Planned focus | Status | Build/test evidence, blockers, next action |
+| Date | Focus | Status | Evidence / next action |
 |---|---|---|---|
-| 0 · 5–11 Oct | Clone/build starter; confirm shared contracts | Not verified | |
-| 1 · 12–18 Oct | [Use Alyan's assigned guide] | Not started | |
-| 2 · 19–25 Oct | [Use Alyan's assigned guide] | Not started | |
-| 3 · 26 Oct–1 Nov | [Use Alyan's assigned guide] | Not started | |
-| 4 · 2–8 Nov | [Use Alyan's assigned guide] | Not started | |
-| 5 · 9–15 Nov | [Use Alyan's assigned guide] | Not started | |
-| 6 · 16–22 Nov | Integration, test fixes, report section | Not started | |
+| 2026-11-03 | B1–B5 rendering, HUD, explosions, sonar | Implemented in integration PR; member review pending | `src/alyan/*.inc`; MASM assembly/link and 1,090-check harness passed under Wine. Alyan must review, build in Visual Studio, and run the manual display/sonar tests. |
+| Pending | Lab-PC acceptance | Not tested | Record OS/VS/Irvine versions and actual results in `docs/testing/acceptance-checklist.md`. |
+| Pending | Individual report/viva preparation | Draft provided | Review `docs/viva/alyan.md`, personalize `docs/report/alyan.md`, and practise the debugger tasks. |
 
-## Weekly update template
+## Integration notes
 
-- **Completed:** [actual changes]
-- **Build/test:** [configuration, exact tests, result]
-- **Blocked / risks:** [none or describe]
-- **Next:** [next step]
+- Implemented `InitSystem`, buffer helpers, changed-cell `Render`, and `BuildFrame`.
+- Implemented five-digit HUD conversion with a small `LOCAL` stack buffer.
+- Implemented five-slot, five-frame explosions.
+- Implemented sonar start/end, one-time sweep, hidden-mine drawing, and recharge display.
+- Pause during sonar is supported through shared state remembered by Anas's input code.
+- Optional `RenderFast` / `REPE CMPSW` was deliberately omitted for simplicity.
+
+## Review checklist for Alyan
+
+- [ ] Explain `ScreenBuf` WORD layout and the row/column offset calculation.
+- [ ] Explain changed-cell rendering and the skipped bottom-right cell.
+- [ ] Explain `PutNumber`, `DIV`, and the local digit buffer.
+- [ ] Explain hidden-mine visibility versus collision activity.
+- [ ] Build Win32 in Visual Studio and run the sonar/pause/explosion tests.
+- [ ] Record real lab-PC results and disclose AI assistance accurately.

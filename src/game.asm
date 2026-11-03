@@ -2,51 +2,53 @@ TITLE Depth Charge - Submarine Defense with Sonar Detection
 
 ;===============================================================
 ; game.asm - Owner: Muhammad Anas (25K-0899)
-; Steps: A2 (main, GameLoop), A3 (FrameDelay), A7 (InitGame)
-; Main entry point, game state machine, new-game reset, and
-; 80 ms frame timing for Depth Charge.
+; One ASM file includes the three members' small INCLUDE modules.
+; Windows x86 / MASM / Irvine32. No DOS or BIOS interrupts.
 ;===============================================================
 
 INCLUDE Irvine32.inc
 INCLUDE shared\constants.inc
 INCLUDE shared\data.inc
 
+; Windows sound API; frequency is in Hz and duration in ms.
+Beep PROTO, dwFreq:DWORD, dwDuration:DWORD
+
 .code
-;---------------------------------------------------------------
-; main: program entry point and outer menu loop
-;---------------------------------------------------------------
 main PROC
-    call InitSystem              ; Alyan: seed random, hide cursor
-    call LoadHighScore           ; Ali  : read highscore.dat
+    call InitSystem              ; Alyan: seed random and hide cursor
+    call LoadHighScore           ; Ali: read the previous best score
 MenuLoop:
-    call ShowMenu                ; Ali  : sets gameState = PLAYING or EXIT
+    call ShowMenu                ; Ali: choose start or exit
     cmp  gameState, ST_EXIT
     je   Quit
-    call InitGame                ; Anas : reset variables and arrays
-    call GameLoop                ; Anas : run frames until game ends
+    call InitGame
+    call GameLoop
     jmp  MenuLoop
 Quit:
     call Clrscr
     exit
 main ENDP
 
-;---------------------------------------------------------------
-; InitGame: resets every variable and object array for a new game
-;---------------------------------------------------------------
+; InitGame: reset a round, but keep the saved high score.
 InitGame PROC USES eax ecx edi
     mov  score, 0
     mov  lives, 3
     mov  level, 1
     mov  subX, 40
     mov  fireCooldown, 0
+    mov  frameCount, 0
+    mov  sonarStart, 0
     mov  sonarReadyAt, 0
-    call ApplyLevel              ; Ali: sets fallDelay and spawnDelay
+    mov  sonarPlayed, 0
+    mov  stateBeforePause, ST_PLAYING
+    mov  pauseStarted, 0
+    call ApplyLevel
     mov  al, fallDelay
     mov  fallTimer, al
     mov  al, spawnDelay
     mov  spawnTimer, al
 
-    ; clear all three object arrays with REP STOSB (AL = 0)
+    ; Clear all object arrays and their separate explosion timers.
     cld
     mov  al, 0
     mov  edi, OFFSET Torpedoes
@@ -58,64 +60,68 @@ InitGame PROC USES eax ecx edi
     mov  edi, OFFSET Explosions
     mov  ecx, SIZEOF Explosions
     rep  stosb
+    mov  edi, OFFSET ExplTimer
+    mov  ecx, SIZEOF ExplTimer
+    rep  stosb
 
+    call ReadKeyFlush            ; do not carry menu keys into play
     call Clrscr
-    call InvalidateScreen        ; Alyan: force a full redraw
+    call InvalidateScreen
     mov  gameState, ST_PLAYING
     call GetMseconds
     mov  lastFrame, eax
     ret
 InitGame ENDP
 
-;---------------------------------------------------------------
-; GameLoop: one pass = one frame. Returns on GAME OVER or ESC.
-;---------------------------------------------------------------
+; GameLoop: input -> update -> collisions -> draw -> wait.
+; Sonar and pause skip object updates, not input or drawing.
 GameLoop PROC
 NextFrame:
-    call HandleInput             ; Anas: read keys without waiting
+    call HandleInput
     mov  al, gameState
     cmp  al, ST_PLAYING
     je   DoPlaying
     cmp  al, ST_SONAR
     je   DoSonar
     cmp  al, ST_PAUSED
-    je   DoDraw                  ; paused: draw only, no updates
-    jmp  GameEnded               ; ST_GAMEOVER or ST_MENU
+    je   DoDraw
+    jmp  GameEnded
 
 DoPlaying:
-    call UpdateTorpedoes         ; Anas
-    call UpdateCharges           ; Ali
-    call SpawnCharge             ; Ali
-    call UpdateExplosions        ; Alyan
-    call CheckCollisions         ; Anas (may set ST_GAMEOVER)
+    call UpdateTorpedoes
+    call UpdateCharges
+    call SpawnCharge
+    call UpdateExplosions
+    call CheckCollisions
+    cmp  gameState, ST_GAMEOVER
+    je   GameEnded
     jmp  DoDraw
 DoSonar:
-    call UpdateSonar             ; Alyan (may set ST_PLAYING)
+    call UpdateSonar
 DoDraw:
-    call BuildFrame              ; Alyan
-    call Render                  ; Alyan
-    call FrameDelay              ; Anas
+    call BuildFrame
+    call Render
+    call FrameDelay
     jmp  NextFrame
-
 GameEnded:
     cmp  gameState, ST_GAMEOVER
     jne  BackToMenu
-    call GameOverScreen          ; Ali (calls SaveHighScore)
+    call GameOverScreen          ; saves a record and waits for a key
 BackToMenu:
     ret
 GameLoop ENDP
 
-;---------------------------------------------------------------
-; FrameDelay: waits until FRAME_MS (80 ms) have passed since lastFrame
-;---------------------------------------------------------------
+; FrameDelay: target 80 ms per frame, about 12.5 frames/second.
+; A long blocking sound may make one frame longer; we do not try
+; to catch up by moving objects several times on the next frame.
 FrameDelay PROC USES eax
     call GetMseconds
-    sub  eax, lastFrame          ; eax = elapsed ms this frame
+    sub  eax, lastFrame
     cmp  eax, FRAME_MS
-    jae  NoWait                  ; frame already took 80 ms or more
+    jae  NoWait
     neg  eax
-    add  eax, FRAME_MS           ; eax = FRAME_MS - elapsed
-    call Delay                   ; Irvine32: sleep EAX ms
+    add  eax, FRAME_MS           ; remaining = 80 - elapsed
+    call Delay
 NoWait:
     call GetMseconds
     mov  lastFrame, eax
@@ -123,24 +129,18 @@ NoWait:
     ret
 FrameDelay ENDP
 
-; Temporary no-op implementations keep the shared procedure interface linkable.
-; Remove an individual *_STUB line as soon as its real implementation is added.
-INCLUDE anas\stubs_anas.inc
-INCLUDE alyan\stubs_alyan.inc
-INCLUDE ali\stubs_ali.inc
-
-; ---- Anas: main loop support ----
+; ---- Anas: input and game rules ----
 INCLUDE anas\input.inc
 INCLUDE anas\torpedo.inc
 INCLUDE anas\collision.inc
 
-; ---- Alyan: presentation / sonar ----
+; ---- Alyan: drawing and sonar ----
 INCLUDE alyan\render.inc
 INCLUDE alyan\hud.inc
 INCLUDE alyan\explosion.inc
 INCLUDE alyan\sonar.inc
 
-; ---- Ali: game systems / persistence ----
+; ---- Ali: enemies, screens, score, sound and file ----
 INCLUDE ali\random.inc
 INCLUDE ali\screens.inc
 INCLUDE ali\charges.inc

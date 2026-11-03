@@ -67,8 +67,7 @@ SubLoop:
     mov  ah, SUB_ROW
     call StartExplosion                 ; AL = subX, AH = SUB_ROW
     call LoseLife
-    cmp  gameState, ST_GAMEOVER
-    je   Done
+    jmp  Done                    ; at most one submarine hit per frame
 NextS:
     add  edi, TYPE GameObject
     loop SubLoop

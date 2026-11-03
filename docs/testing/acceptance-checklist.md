@@ -1,29 +1,41 @@
 # Whole-game acceptance checklist
 
-Run on a lab PC with the final integrated build. Record the actual build/tool environment and result for every row. This checklist follows the attached implementation guide; a checked box should be supported by a real test.
+Run this on the lab PC with the final integrated build. A checked box must be supported by a real test. Compatibility-environment results are recorded separately in [verification-2026-11-03.md](verification-2026-11-03.md); they do not replace this lab checklist.
 
-**Test environment:** OS __________ · PC __________ · Visual Studio __________ · Irvine32 __________ · Configuration __________ · Date __________
+**Lab test environment:** OS __________ · PC __________ · Visual Studio __________ · Irvine32 __________ · Configuration __________ · Date __________ · Tester __________
 
 | Done | Test | Expected result | Owner | Actual result / evidence |
 |---|---|---|---|---|
-| [ ] | Menu | Three options and high score; option 2 opens instructions; option 3 / ESC exits | Ali | |
-| [ ] | Movement | A/D and arrow keys move the submarine; it stops at columns 1 and 78 without lag | Anas | |
-| [ ] | Firing | W fires; at most 8 torpedoes are active; cooldown creates a small gap | Anas | |
-| [ ] | Charges | Charges appear in random columns; about 1 in 5 are hidden mines | Ali | |
-| [ ] | Hits | Visible charge gives +10 and hidden mine +25; test at a high level too | Anas | |
-| [ ] | Explosion | Explosion animates for approximately 5 frames | Alyan | |
-| [ ] | Lives / game over | One life is lost per submarine hit; game over follows the last life | Ali | |
-| [ ] | Levels | Level increases every 200 points; charges get faster | Ali | |
-| [ ] | Sonar | SPACE pauses movement for 2 seconds, marks hidden mines with `!`, plays sweep sound, then has 10-second cooldown | Alyan | |
-| [ ] | Pause | P pauses/resumes; objects do not move while paused | Anas | |
-| [ ] | Sounds | Fire, explosion, sonar, life-lost, and game-over sounds are distinct | Ali | |
-| [ ] | High score | Saved high score remains after restarting the program | Ali | |
-| [ ] | Drawing | No visible flicker; HUD is correct throughout play | Alyan | |
-| [ ] | Replay | Game over → menu → new game resets score, lives, and all object arrays | Anas | |
-| [ ] | Long run | Ten minutes of play without crash or noticeable slowdown | All | |
+| [ ] | Visual Studio build | Debug and Release Win32 build without errors | Anas | |
+| [ ] | Menu | Three options and high score; 2 opens instructions; 3/ESC exits | Ali | |
+| [ ] | Movement | A/D and arrows move; stops at columns 1 and 78; capitals work | Anas | |
+| [ ] | Firing | W fires with a gap; slots are reused; full-array guard does not crash | Anas | |
+| [ ] | Charges | Random columns; about 1 in 5 hidden; 15-slot cap; fall timer works | Ali | |
+| [ ] | Hits | Visible +10, hidden +25; crossing hit works at high level too | Anas | |
+| [ ] | Explosion | Short ASCII animation at the hit position; slots free again | Alyan | |
+| [ ] | Lives/game over | One life per submarine hit frame; game over after third life | Ali/Anas | |
+| [ ] | Levels | Level changes at 200-point boundaries; cap 9; delays shrink | Ali | |
+| [ ] | Sonar | SPACE freezes objects about 2 s, shows green !, then 10 s recharge | Alyan | |
+| [ ] | Pause in play | P freezes objects; P resumes; W does not fire while paused | Anas | |
+| [ ] | Pause in sonar | P pauses; resume returns to sonar with remaining reveal time | Anas/Alyan | |
+| [ ] | Sounds | Five distinct effects on lab audio; muted audio does not break play | Ali | |
+| [ ] | High score | New record survives program restart; tie is not called new | Ali | |
+| [ ] | File errors | Missing file starts at 0; read-only folder shows save error | Ali | |
+| [ ] | Drawing | No obvious flicker/scroll; HUD correct; bottom-right not printed | Alyan | |
+| [ ] | Replay | Game over → menu → new game resets all round state | Anas | |
+| [ ] | ESC | Returns to menu without saving the abandoned round | Anas/Ali | |
+| [ ] | Long run | Ten minutes of play/replay without crash or growing lag | All | |
 
 ## Defect log
 
 | ID | Date | Steps / observed result | Expected result | Owner | Fix PR / retest |
 |---|---|---|---|---|---|
 | | | | | | |
+
+## Sign-off
+
+- Anas: __________ Date: __________
+- Alyan: __________ Date: __________
+- Ali: __________ Date: __________
+
+Do not sign until the rows you own have actual evidence.
