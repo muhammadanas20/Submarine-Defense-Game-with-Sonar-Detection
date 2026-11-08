@@ -2,7 +2,7 @@
 
 A simple, single-player **80 × 25 text-console game** written in **x86 assembly (MASM + Irvine32)** for EL-2003 Computer Organization and Assembly Language Lab, Fall 2026.
 
-**Status:** this revision has not been built or run on Windows. Test the changes before using them for submission. Earlier tests mentioned below apply only to the previous revision. The code has been assembled, linked, and exercised in a Windows compatibility environment. Final Visual Studio/lab-PC acceptance and individual member review are still required. See [Verification](docs/testing/verification-2026-11-03.md).
+**Status:** this revision has not been built or run on Windows. Test the changes before using them for submission. Earlier tests mentioned below apply only to the previous revision. The latest changes (renaming the `Pause`/`Resume` labels that newer MASM rejects, and the redrawn submarine/depth-charge art) were checked statically only: sprite widths against the geometry constants, every string against the 80-column layout, label/`call` resolution per procedure, and a reserved-word scan over all 215 identifiers. Build with **Ctrl+Shift+B** in Visual Studio and play a round before submitting. The code has been assembled, linked, and exercised in a Windows compatibility environment. Final Visual Studio/lab-PC acceptance and individual member review are still required. See [Verification](docs/testing/verification-2026-11-03.md).
 
 ## Team and course
 
@@ -19,7 +19,9 @@ A simple, single-player **80 × 25 text-console game** written in **x86 assembly
 
 ## How to play
 
-You control the green submarine `<==[O]==>` near the bottom of the screen. Avoid falling depth charges `(*)` and shoot them with torpedoes `^`. Some charges are hidden mines: they are real objects in memory but are not drawn during normal play. Sonar reveals them as green `[!]` marks.
+You control the green submarine — an 11-cell hull `<=-[ooo]-=>` with the `_!_` conning tower and periscope drawn on the row above — near the bottom of the screen. Avoid falling depth charges `(@)` and shoot them with torpedoes `^`. Some charges are hidden mines: they are real objects in memory but are not drawn during normal play. Sonar reveals them as green `[!]` marks.
+
+Every sprite is one line of text drawn centred on the object's `x`, so each design has an odd number of cells. The art strings live in `src/alyan/render.inc` and their widths/hit windows live next to each other in `src/shared/constants.inc` (`SUB_W`/`SUB_HALF`, `SAIL_W`, `CHG_W`/`CHG_HALF`, `MINE_W`, `SUB_HIT`, `TORP_HIT`); movement, drawing and collision all read those constants, so a redesign only needs the string plus its width.
 
 | Key | Action |
 |---|---|
@@ -73,6 +75,8 @@ The project already sets the MASM include path, Irvine library path, entry point
 | Unresolved external symbol | Confirm Win32, the correct Irvine library, and `kernel32.lib;user32.lib` |
 | SafeEH error | Linker → Advanced → Image Has Safe Exception Handlers = **No** |
 | Entry-point error | Linker → Advanced → Entry Point = **main** |
+| `error A2008: syntax error` reported on the line *after* a label | The label name is a MASM reserved word. `PAUSE` is an x86 instruction and `RESUME` is the `.TRY`/`.FINALLY` operator, and reserved words are case-insensitive, so `Pause:`/`Resume:` in `anas\input.inc` build with MASM 6.14 but fail with the newer `ml.exe` in Visual Studio 2022/2026. They are now `PauseGame:`/`UnpauseGame:`; never name a label, variable, or procedure a bare instruction or directive name (or disable the keyword with `OPTION NOKEYWORD:<name>`) |
+| Submarine or charge art looks shifted | The art string in `alyan\render.inc` and the `*_W`/`*_HALF` constants in `shared\constants.inc` must agree, and each sprite must stay an odd number of cells wide |
 | Game area is cut off | Enlarge the console window/buffer to at least 80 × 25 |
 | No sound | Check Windows volume and output device; muted sound does not stop gameplay |
 
@@ -91,7 +95,7 @@ src/
 │   ├── torpedo.inc          Fire and move torpedoes
 │   └── collision.inc        Torpedo/charge and charge/submarine hits
 ├── alyan/
-│   ├── render.inc           Console setup, screen buffers, changed-cell drawing
+│   ├── render.inc           Console setup, ASCII art, screen buffers, changed-cell drawing
 │   ├── hud.inc              Score/lives/level/sonar status and pause message
 │   ├── explosion.inc        Five-frame ASCII explosion
 │   └── sonar.inc            Two-second reveal and ten-second recharge
@@ -130,6 +134,7 @@ The course outline requires a written report and individual viva. The report dra
 ## Deliberately simple design
 
 - Fixed arrays: 8 torpedoes, 15 charges, 5 explosions.
+- One-line ASCII sprites, each drawn centred on the object's `x`; every width, border clamp and hit window comes from one block of constants in `shared\constants.inc`.
 - Each slot uses four bytes: x, y, active and hidden. The code uses offsets 0 to 3 and moves four bytes to the next slot.
 - Short procedures with comments and predictable register inputs/outputs.
 - Two screen buffers; only changed cells are sent to the console.

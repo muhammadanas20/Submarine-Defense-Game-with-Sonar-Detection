@@ -5,7 +5,7 @@ strLevel  BYTE "LEVEL ", 0
 strSonar  BYTE "SONAR ", 0
 strReady  BYTE "READY ", 0
 strActive BYTE "ACTIVE", 0
-strPaused BYTE "PAUSED - press P to resume", 0
+strPaused BYTE "== PAUSED - press P to resume ==", 0
 strKeys   BYTE "A/D MOVE  W FIRE  SPACE SONAR  P PAUSE  ESC MENU", 0
 
 .code
@@ -81,20 +81,22 @@ DrawHUD PROC USES eax ebx edx esi
     mov  dl, 45
     mov  bl, ATTR_HUD
     call PutNumber
-    jmp  PauseMessage
+    jmp  DrawPauseBanner
 SonarActive:
     mov  esi, OFFSET strActive
     call PutString
-    jmp  PauseMessage
+    jmp  DrawPauseBanner
 SonarReady:
     mov  ah, ATTR_HUD
     mov  esi, OFFSET strReady
     call PutString
-PauseMessage:
+; "PauseMessage" was renamed: keep pause/banner label names clear of MASM
+; reserved words (see the note in anas\input.inc).
+DrawPauseBanner:
     cmp  gameState, ST_PAUSED
     jne  ShowKeys
     mov  dh, 12
-    mov  dl, 27
+    mov  dl, 24                 ; centres the 32-cell banner in 80 columns
     mov  ah, ATTR_HUD
     mov  esi, OFFSET strPaused
     call PutString

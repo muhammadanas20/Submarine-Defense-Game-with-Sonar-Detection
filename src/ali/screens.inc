@@ -10,8 +10,8 @@ strHelp1   BYTE "A / D or Left / Right : move the submarine", 0
 strHelp2   BYTE "W : fire a torpedo       P : pause / resume", 0
 strHelp3   BYTE "SPACE : sonar for 2 seconds; 10-second recharge", 0
 strHelp4   BYTE "ESC : return to the menu without saving this round", 0
-strHelp5   BYTE "(*) = charge: +10 points. Hidden mine: +25 points.", 0
-strHelp6   BYTE "Sonar reveals hidden mines as green [!] marks.", 0
+strHelp5   BYTE "(@) depth charge : +10 points", 0
+strHelp6   BYTE "[!] hidden mine (seen with sonar) : +25 points", 0
 strHelp7   BYTE "You have 3 lives. Every 200 points adds a level.", 0
 strHelp8   BYTE "Charges fall faster as you reach higher levels.", 0
 strAnyKey  BYTE "Press any key to return to the menu", 0
@@ -50,6 +50,18 @@ Redraw:
     mov  dh, 5
     mov  dl, 24
     mov  esi, OFFSET strTitle
+    call PrintAt
+
+    ; the real submarine, drawn on the menu the same way as on the field:
+    ; sail centred one row above the 11-cell hull
+    mov  eax, ATTR_SUB
+    mov  dh, 6
+    mov  dl, 38
+    mov  esi, OFFSET subSail
+    call PrintAt
+    mov  dh, 7
+    mov  dl, 34
+    mov  esi, OFFSET subArt
     call PrintAt
 
     mov  eax, ATTR_TEXT
