@@ -17,9 +17,12 @@ FindSlot:
     jmp  Done
 
 Found:
-    mov  eax, MAX_COL - MIN_COL - 1
+    ; x is the sprite's centre: keep the whole charge (CHG_HALF cells on each
+    ; side) inside the borders, so x runs from MIN_COL + CHG_HALF to
+    ; MAX_COL - CHG_HALF
+    mov  eax, MAX_COL - MIN_COL - 2 * CHG_HALF + 1
     call Rand
-    add  al, MIN_COL + 1
+    add  al, MIN_COL + CHG_HALF
     mov  BYTE PTR [esi + 0], al
     mov  BYTE PTR [esi + 1], TOP_ROW
     mov  BYTE PTR [esi + 2], 1

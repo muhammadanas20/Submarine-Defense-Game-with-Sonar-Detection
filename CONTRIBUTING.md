@@ -40,6 +40,14 @@ Open a PR with a title such as `Week 1 – Anas – A2 A3`. Include the build/te
 - Ali: `src/ali/` and Ali's docs.
 - Coordinate any shared-data contract change before merging it. Project files are maintained by Anas; members should not commit personal Visual Studio setting changes.
 
+## Naming rules (read before adding a label)
+
+MASM reserves every instruction mnemonic, directive, and operator, and reserved words are **case-insensitive**. A label or variable named after one assembles with the old MASM 6.14 and then stops the newer `ml.exe` in Visual Studio 2022/2026 with `error A2008: syntax error`, which points at the line *after* the label. This already happened with `Pause:`/`Resume:` in `anas\input.inc` (now `PauseGame:`/`UnpauseGame:`) and the old `PauseMessage:` in `alyan\hud.inc` (now `DrawPauseBanner:`).
+
+- Do not name anything `pause`, `resume`, `exit`, `loop`, `int`, `nop`, `wait`, `size`, `width`, `mask`, `record`, `label`, `local`, `title`, `public`, `comment`, `proc`, or any other keyword.
+- Prefer a verb-plus-object name (`PauseGame`, `KeyFire`, `FindSlot`); a two-word name cannot collide with a reserved word.
+- Sprites: art strings are in `alyan\render.inc`, their widths and hit windows are in `shared\constants.inc`. Keep each sprite an odd number of cells and update both files together, or centring and collisions drift apart.
+
 ## Stubs and implementation
 
 The three `stubs_*.inc` files define temporary no-op procedures so the program can be integrated incrementally. As a real procedure is added to its module file, delete its matching stub invocation (for example, after implementing `HandleInput`, remove `ANAS_STUB HandleInput`). Leave the other stubs in place until their implementations are ready.

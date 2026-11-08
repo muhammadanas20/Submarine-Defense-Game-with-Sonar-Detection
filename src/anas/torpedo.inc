@@ -15,7 +15,8 @@ FindSlot:
 Found:
     mov  al, subX
     mov  BYTE PTR [esi + 0], al
-    mov  BYTE PTR [esi + 1], SUB_ROW - 1
+    mov  BYTE PTR [esi + 1], SUB_ROW - 2   ; above the sail, so the shot never
+                                           ; hides the periscope for a frame
     mov  BYTE PTR [esi + 2], 1
     mov  fireCooldown, 3
     call PlayFireSound

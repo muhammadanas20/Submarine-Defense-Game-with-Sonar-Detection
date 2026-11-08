@@ -1,7 +1,19 @@
 .data
-subArt BYTE "<==[O]==>", 0
-chargeArt BYTE "(*)", 0
-mineArt BYTE "[!]", 0
+; --- ASCII art -------------------------------------------------------------
+; A text console has one character per cell, so every design is one line that
+; is drawn centred on the object's x.  The widths must match the SUB_W /
+; SAIL_W / CHG_W / MINE_W values in shared\constants.inc, or the centring and
+; the hit boxes drift apart.
+;
+; Submarine    <=-[ooo]-=>   steel hull, three portholes, propeller (left),
+;                            bow taper (right)
+;              _!_           conning tower with periscope, one row above
+; Depth charge (@)           red drum falling from the surface
+; Hidden mine  [!]           drawn only while sonar is active
+subArt      BYTE "<=-[ooo]-=>", 0
+subSail     BYTE "_!_", 0
+chargeArt   BYTE "(@)", 0
+mineArt     BYTE "[!]", 0
 titleStr   BYTE "Depth Charge - Submarine Defense", 0
 cursorInfo CONSOLE_CURSOR_INFO <25, 0>
 
@@ -80,11 +92,17 @@ DrawBorders ENDP
 BuildFrame PROC USES ecx edx esi edi
     call ClearBuffer
     call DrawBorders
-    ; sub ka center subX hai
+    ; sub ka center subX hai: pehle tower/periscope, phir hull
+    mov  ah, ATTR_SUB
+    mov  dh, SUB_ROW - 1
+    mov  dl, subX
+    sub  dl, SAIL_HALF
+    mov  esi, OFFSET subSail
+    call PutString
     mov  ah, ATTR_SUB
     mov  dh, SUB_ROW
     mov  dl, subX
-    sub  dl, 4
+    sub  dl, SUB_HALF
     mov  esi, OFFSET subArt
     call PutString
 
@@ -119,7 +137,7 @@ VisibleCharge:
 DrawCharge:
     mov  dh, BYTE PTR [esi + 1]
     mov  dl, BYTE PTR [esi + 0]
-    dec  dl
+    sub  dl, CHG_HALF     ; chargeArt and mineArt are both 3 cells wide
     push esi
     mov  esi, edi
     call PutString
