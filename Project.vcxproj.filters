@@ -33,18 +33,15 @@
     <None Include="src\anas\input.inc"><Filter>Header Files\Anas</Filter></None>
     <None Include="src\anas\torpedo.inc"><Filter>Header Files\Anas</Filter></None>
     <None Include="src\anas\collision.inc"><Filter>Header Files\Anas</Filter></None>
-    <None Include="src\anas\stubs_anas.inc"><Filter>Header Files\Anas</Filter></None>
     <None Include="src\alyan\render.inc"><Filter>Header Files\Alyan</Filter></None>
     <None Include="src\alyan\hud.inc"><Filter>Header Files\Alyan</Filter></None>
     <None Include="src\alyan\explosion.inc"><Filter>Header Files\Alyan</Filter></None>
     <None Include="src\alyan\sonar.inc"><Filter>Header Files\Alyan</Filter></None>
-    <None Include="src\alyan\stubs_alyan.inc"><Filter>Header Files\Alyan</Filter></None>
     <None Include="src\ali\random.inc"><Filter>Header Files\Ali</Filter></None>
     <None Include="src\ali\screens.inc"><Filter>Header Files\Ali</Filter></None>
     <None Include="src\ali\charges.inc"><Filter>Header Files\Ali</Filter></None>
     <None Include="src\ali\sound.inc"><Filter>Header Files\Ali</Filter></None>
     <None Include="src\ali\score.inc"><Filter>Header Files\Ali</Filter></None>
     <None Include="src\ali\highscore.inc"><Filter>Header Files\Ali</Filter></None>
-    <None Include="src\ali\stubs_ali.inc"><Filter>Header Files\Ali</Filter></None>
   </ItemGroup>
 </Project>
