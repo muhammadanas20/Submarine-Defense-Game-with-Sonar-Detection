@@ -1,5 +1,42 @@
-;===============================================================
-; sound.inc - Owner: Ali Raza (25K-0827)
-; Planned procedures: PlayFireSound, PlayExplosionSound, PlaySonarSweep,
-;                    PlayLifeLostSound, PlayGameOverSound
-;===============================================================
+mPlaySound MACRO frequency, duration
+    pushad
+    INVOKE Beep, frequency, duration
+    popad
+ENDM
+
+.code
+PlayFireSound PROC
+    mPlaySound 1200, 20
+    ret
+PlayFireSound ENDP
+
+PlayExplosionSound PROC
+    mPlaySound 150, 30
+    ret
+PlayExplosionSound ENDP
+
+PlayLifeLostSound PROC
+    mPlaySound 300, 120
+    mPlaySound 200, 180
+    ret
+PlayLifeLostSound ENDP
+
+PlayGameOverSound PROC USES ebx ecx
+    mov  ebx, 600
+    mov  ecx, 4
+NextNote:
+    mPlaySound ebx, 150
+    sub  ebx, 100
+    loop NextNote
+    ret
+PlayGameOverSound ENDP
+
+PlaySonarSweep PROC USES ebx ecx
+    mov  ebx, 400
+    mov  ecx, 5
+NextNote:
+    mPlaySound ebx, 50
+    add  ebx, 100
+    loop NextNote
+    ret
+PlaySonarSweep ENDP
