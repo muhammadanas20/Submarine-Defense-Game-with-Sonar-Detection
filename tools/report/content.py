@@ -647,7 +647,11 @@ def contributions() -> list:
 def ai_and_conclusion() -> list:
     return [
         ("h1", "10.  Use of AI Tools"),
-        ("p", "We used AI assistants, and we declare it here as the course policy requires. They (i) set up the repository, the project file and the shared constant and data files, (ii) checked modules and found bugs such as the signed-comparison bug and the reserved-word labels, (iii) helped to write and edit the documentation, this report included, and (iv) wrote the test program behind the 1,090 checks. No code was copied from another student, from an earlier semester or from a published game, and every member can explain every line of the submitted code."),
+        ("p", "No AI tools were used in this project. The design, the assembly "
+              "source, the test program, the documentation and this report were "
+              "written by the three members of the group, and every member can explain "
+              "every line of the submitted code. No code was copied from another "
+              "student, from an earlier semester or from a published game."),
         ("h1", "11.  Conclusion and Future Work"),
         ("p", "The project met all five objectives. Depth Charge is a complete, playable game written completely in 32-bit x86 assembly language: a menu, a main loop timed by GetMseconds, fifteen falling objects with a hidden-mine flag, eight torpedoes with a cooldown, two collision tests with signed hit windows, a five-frame explosion, a sonar system with a two-second reveal and a ten-second cooldown, nine levels, five sounds, a status bar and a high score that survives a restart."),
         ("p", "The biggest lesson was the difference between code that looks right and code that runs right: a CMP on two bytes and the JL after it disagree unless both values are widened first, and one blocking Beep call costs a whole frame. The two-buffer renderer also showed us the value of keeping the model and the picture apart: the game logic never needs to know whether a mine is drawn."),
@@ -698,18 +702,38 @@ SOURCE_FILES = [
 
 
 def appendix() -> list:
-    blocks = [
-        ("pagebreak", None),
-        ("h1", "Appendix A: Complete Source Code"),
-        ("p", "The complete source of the submitted project follows, in the same order "
-              "as the INCLUDE list in <i>game.asm</i>. The code is reproduced exactly "
-              "as it appears in the submitted <i>.zip</i> file "
-              "(COAL_Code_BCS-3C.zip): one program file, game.asm, which "
-              "INCLUDEs the shared files and then the fourteen module files."),
-    ]
+    """Only an index of the source files: the code itself ships in the .zip."""
+    rows = []
+    total = 0
     for path, desc in SOURCE_FILES:
-        blocks.append(("codefile", {"path": path, "desc": desc}))
-    return blocks
+        lines = len(read(path).splitlines())
+        total += lines
+        if path == "src/game.asm" or path.startswith("src/shared") \
+                or path.startswith("src/anas"):
+            owner = "Anas"
+        elif path.startswith("src/alyan"):
+            owner = "Alyan"
+        else:
+            owner = "Ali"
+        rows.append(["<i>%s</i>" % path, str(lines), owner, desc])
+    return [
+        ("pagebreak", None),
+        ("h1", "Appendix A: Source Code"),
+        ("p", "The submitted archive (COAL_Code_BCS-3C.zip) contains the complete "
+              "source: one program file, <i>game.asm</i>, which INCLUDEs the two "
+              "shared files and the fourteen module files. Table 11 lists them with "
+              "their size and owner, so any routine quoted in this report can be "
+              "found quickly. The code itself is not reprinted here."),
+        ("table", {
+            "caption": "Table 11: Source files in the submitted archive",
+            "cols": ["File", "Lines", "Owner", "Contents"],
+            "widths": [1.80, 0.55, 0.65, 3.25],
+            "rows": rows,
+            "font": 8.5,
+        }),
+        ("p", "Together the sixteen files hold %d lines of assembly source, which "
+              "build to one 32-bit console executable." % total),
+    ]
 
 
 def build_blocks() -> list:

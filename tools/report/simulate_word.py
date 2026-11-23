@@ -42,7 +42,7 @@ def main() -> None:
 
     pdf = pymupdf.open(POST)
     appendix = next((i + 1 for i, page in enumerate(pdf)
-                     if "Appendix A: Complete" in page.get_text()), None)
+                     if "Appendix A:" in page.get_text()), None)
     print(f"total pages {len(pdf)}, appendix starts on page {appendix}, "
           f"body pages {appendix - 2} (limit 15)")
 
