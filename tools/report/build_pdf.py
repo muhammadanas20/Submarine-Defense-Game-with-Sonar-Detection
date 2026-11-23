@@ -12,9 +12,9 @@ from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import (BaseDocTemplate, Frame, Image, KeepTogether,
-                                PageBreak, PageTemplate, Paragraph, Preformatted,
-                                Spacer, Table, TableStyle)
+from reportlab.platypus import (BaseDocTemplate, Flowable, Frame, Image,
+                                KeepTogether, PageBreak, PageTemplate, Paragraph,
+                                Preformatted, Spacer, Table, TableStyle)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -119,6 +119,52 @@ def code_flowable(text: str, size=8.0) -> Preformatted:
     return Preformatted(text, style)
 
 
+class CaptionedTable(Flowable):
+    """A table caption and its table that never get separated.
+
+    When the pair does not fit, the table is split by rows and the caption
+    travels with the first part; if even the header would not fit, the whole
+    block moves to the next page.
+    """
+
+    def __init__(self, caption, table):
+        Flowable.__init__(self)
+        self.caption = caption
+        self.table = table
+        self._width = 0
+        self._height = 0
+
+    def wrap(self, availWidth, availHeight):
+        w1, h1 = self.caption.wrap(availWidth, availHeight)
+        w2, h2 = self.table.wrap(availWidth, availHeight)
+        self._width = max(w1, w2)
+        self._height = h1 + h2
+        self._cap_h = h1
+        return self._width, self._height
+
+    def split(self, availWidth, availHeight):
+        if availHeight >= self._height:
+            return [self]
+        room = availHeight - self._cap_h
+        if room < 3 * 12:                      # caption and almost nothing else
+            return []
+        parts = self.table.split(availWidth, room)
+        rows = getattr(parts[0], "_cellvalues", None) if parts else None
+        if not parts or rows is None or len(rows) < 3:   # header + 2 rows
+            return []                          # let the block start a new page
+        # hand the caption and the whole table back to the frame; the table
+        # splits itself with one repeated header row
+        return [self.caption, self.table]
+
+    def draw(self):
+        table_w = getattr(self.table, "_width", self._width)
+        self.table.drawOn(self.canv, (self._width - table_w) / 2.0, 0)
+        self.caption.drawOn(self.canv, 0, self._height - self._cap_h)
+
+    def getSpaceBefore(self):
+        return 8
+
+
 def table_flowable(spec: dict) -> list:
     font = spec.get("font", 9.0)
     body = ParagraphStyle("t", parent=STYLES["cell"], fontSize=font,
@@ -142,8 +188,8 @@ def table_flowable(spec: dict) -> list:
         ("TOPPADDING", (0, 0), (-1, -1), 1.8),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 1.8),
     ]))
-    return [Paragraph(rich(spec["caption"]), STYLES["capabove"]), table,
-            Spacer(1, 8)]
+    caption = Paragraph(rich(spec["caption"]), STYLES["capabove"])
+    return [CaptionedTable(caption, table), Spacer(1, 8)]
 
 
 def figure_flowable(spec: dict) -> KeepTogether:
@@ -249,10 +295,20 @@ def render(blocks: list) -> list:
         elif kind == "table":
             flow.extend(table_flowable(payload))
         elif kind == "figure":
-            flow.append(figure_flowable(payload))
+            fig = figure_flowable(payload)
+            head = flow[-1] if flow else None
+            # a heading must never be left alone at the bottom of a page
+            if head is not None and getattr(head, "style", None) is not None \
+                    and head.style.name in ("h1", "h2"):
+                flow.pop()
+                inner = getattr(fig, "_content", None)
+                flow.append(KeepTogether([head] + list(inner) if inner
+                                         else [head, fig]))
+            else:
+                flow.append(fig)
         elif kind == "code":
             flow.append(Spacer(1, 4))
-            flow.append(code_flowable(payload["text"], 7.6))
+            flow.append(code_flowable(payload["text"], 8.0))
             if payload.get("caption"):
                 flow.append(Paragraph(rich(payload["caption"]),
                                       STYLES["caption"]))

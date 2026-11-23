@@ -430,7 +430,7 @@ def render(doc: Document, blocks: list) -> None:
             set_run_font(head.add_run(payload["path"]), CODE_FONT, 10, bold=True)
             set_run_font(head.add_run("  \u2014  " + payload["desc"]), BODY_FONT,
                          10, italic=True)
-            add_code(doc, content.read(path), None, size=8.0)
+            add_code(doc, content.read(path), None, size=8.5)
         elif kind == "refs":
             add_refs(doc, payload)
         elif kind == "cover":

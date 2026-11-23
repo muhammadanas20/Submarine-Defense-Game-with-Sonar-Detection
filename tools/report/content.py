@@ -54,23 +54,7 @@ def cover_and_front() -> list:
               "has been disclosed in Section 10 of this report."),
         ("signature_table", None),
         ("h2", "Abstract"),
-        ("p", "Depth Charge is a real-time arcade game written entirely in 32-bit "
-              "x86 assembly language for MASM and the Irvine32 library. The player "
-              "commands a submarine that moves along the bottom of an 80 \u00d7 25 "
-              "colour text console and fires torpedoes upwards at the depth charges "
-              "falling from the surface. One charge in five is a hidden mine: it exists "
-              "in the object array and can still sink the submarine, but it is drawn "
-              "only when SPACE switches on the sonar for two seconds, after which the "
-              "sonar needs ten seconds to recharge. The implementation contains a "
-              "non-blocking keyboard handler, an 80 ms frame timer, spawning from a "
-              "linear congruential generator, nested-loop collision detection with "
-              "signed hit windows, a five-frame ASCII explosion, level-dependent "
-              "difficulty, five sound effects, a status bar and a four-byte binary "
-              "high-score file. Two 80 \u00d7 25 word buffers mean only changed cells "
-              "are written to the console, so the picture never flickers. The project "
-              "shows how a small game engine \u2014 state machine, arrays, procedures, "
-              "timers and file I/O \u2014 is built from registers and library calls in "
-              "assembly language."),
+        ("p", "Depth Charge is a real-time arcade game written completely in 32-bit x86 assembly for MASM and the Irvine32 library. The player moves a submarine along the bottom of an 80 \u00d7 25 colour text screen and fires torpedoes up at the depth charges that fall from the top. One charge in five is a hidden mine: it is in the game array and can still sink the submarine, but it is drawn only when SPACE turns the sonar on for two seconds; after that the sonar needs ten seconds to charge again. The game has a keyboard reader that never stops the game, an 80 ms frame timer, random spawning, collision tests with signed hit windows, a five-frame explosion, nine levels, five sounds, a status bar and a four-byte high-score file. Two 80 \u00d7 25 word buffers mean only the cells that changed are written to the screen, so the picture never flickers. The project shows how a small game engine is built from registers and library calls in assembly language."),
     ]
 
 
@@ -78,31 +62,9 @@ def cover_and_front() -> list:
 def introduction() -> list:
     return [
         ("h1", "1.  Introduction"),
-        ("p", "Most COAL lab programs are sequential: they print a prompt, block "
-              "inside ReadInt until the user types, compute a result and exit. A "
-              "real-time game cannot work that way: it has to move a dozen objects at a "
-              "fixed rate, react to a key press in the frame in which it happens, and "
-              "never stop to wait for the user. Depth Charge closes that gap with a "
-              "complete interactive system in which the program \u2014 not the user "
-              "\u2014 decides when the next step happens."),
-        ("p", "The submarine sits near the bottom of an 80 \u00d7 25 console, moves "
-              "left and right and fires torpedoes upwards, while depth charges fall from "
-              "the surface at pseudo-random columns and must be shot or avoided. Some "
-              "charges are <b>hidden mines</b>: they occupy a slot in the same array and "
-              "can still destroy the submarine, but the renderer skips them until the "
-              "sonar is switched on. SPACE freezes the action for two seconds, plays a "
-              "rising sweep and draws every mine as a green <b>[!]</b>; the sonar then "
-              "needs ten seconds to recharge. The mechanic separates the <i>logical</i> "
-              "state of the game (objects that exist in memory) from its <i>visual</i> "
-              "state (objects that are drawn), which is the idea the project is built "
-              "around."),
-        ("p", "The program is a 32-bit Windows console application built with MASM "
-              "and the Irvine32 library, as taught in the lab. Real-mode techniques such "
-              "as B800h video memory, INT 16h keyboard polling, INT 1Ah timing or the "
-              "42h/43h/61h speaker ports are not available in Windows user mode, so the "
-              "project uses the permitted equivalents: a word buffer laid out like "
-              "text-mode video memory (offset = (row \u00d7 80 + column) \u00d7 2), "
-              "ReadKey, GetMseconds, Delay, SetTextColor and the Win32 Beep function."),
+        ("p", "Most COAL lab programs run in one line: print a prompt, read numbers with ReadInt, compute a result and exit. A game cannot work like that. It must keep moving a dozen objects at a fixed speed, answer a key press in the same frame, and never sit and wait for the user. In Depth Charge the program, not the user, decides when the next step happens."),
+        ("p", "The submarine sits near the bottom of an 80 \u00d7 25 screen, moves left and right and fires torpedoes up, while depth charges fall from the top in random columns and must be shot or avoided. Some charges are hidden mines: they sit in the same array and can still sink the submarine, but the renderer skips them until the sonar is on. SPACE stops the game for two seconds, plays a rising beep and draws every mine as a green <b>[!]</b>; the sonar then needs ten seconds to charge again. This is the main idea of the project: what is in memory and what is drawn on screen are two different things."),
+        ("p", "The program is a 32-bit Windows console program built with MASM and the Irvine32 library, as taught in the lab. Old real-mode tricks such as B800h video memory, INT 16h keyboard polling, INT 1Ah timing or the 42h/43h/61h speaker ports do not work in a Windows program, so the project uses the allowed calls instead: a word buffer laid out like text-mode video memory (offset = (row \u00d7 80 + column) \u00d7 2), ReadKey, GetMseconds, Delay, SetTextColor and Beep."),
     ]
 
 
@@ -134,17 +96,9 @@ def objectives() -> list:
             "cols": ["No.", "Objective", "Status"],
             "widths": [0.45, 4.35, 1.30],
             "rows": rows,
-            "font": 9.5,
+            "font": 8.5,
         }),
-        ("p", "* FrameDelay keeps every frame at or above 80 ms, so movement is limited "
-              "to about 12.5 frames per second on any CPU, and the two-buffer renderer "
-              "writes only the cells that changed, so no flicker is visible. A frame "
-              "becomes slightly longer than 80 ms when a Beep call blocks inside it; "
-              "in-game sounds were therefore limited to 20\u201330 ms (sonar notes to "
-              "50 ms) and the long game-over melody plays only on the game-over screen. "
-              "Everything that the proposal placed out of scope \u2014 graphics mode, "
-              "mouse input, multiplayer, networking, BIOS/DOS interrupts, saved games "
-              "and hand-designed levels \u2014 is still absent."),
+        ("p", "* FrameDelay keeps every frame at 80 ms or more, so the game runs at about 12.5 frames per second on any CPU, and the two-buffer renderer writes only the cells that changed, so nothing flickers. A frame gets a little longer than 80 ms when a Beep call blocks inside it, so the game sounds were kept to 20\u201330 ms and the long game-over tune plays only on the game-over screen. Everything the proposal put out of scope (graphics mode, mouse, multiplayer, networking, BIOS/DOS interrupts, saved games and hand-made levels) is still out."),
     ]
 
 
@@ -165,7 +119,7 @@ def tools() -> list:
                             "member per week", "Module ownership, review and merge"],
         ["Diagrams and report", "draw.io conventions, Microsoft Word, Markdown files "
                                 "in docs/", "Figures 1 to 3, this report, viva notes"],
-        ["Test harness", "A separate assembly driver that calls the real procedures",
+        ["Test harness", "A separate assembly program that calls the real procedures",
          "1,090 automated checks over the game procedures"],
     ]
     return [
@@ -181,7 +135,7 @@ def tools() -> list:
             "cols": ["Tool", "Version / name", "Purpose in this project"],
             "widths": [1.10, 2.60, 2.40],
             "rows": rows,
-            "font": 9.5,
+            "font": 8.5,
         }),
     ]
 
@@ -196,7 +150,7 @@ def design() -> list:
          "Screen geometry, states, colours, limits, sprite widths; all global "
          "variables, object arrays and buffers", "equates, BYTE / DWORD / WORD data"],
         ["anas\\input.inc", "Anas",
-         "Non-blocking key polling, movement, fire and sonar requests, pause with "
+         "Reads the keyboard without stopping the game; movement, fire, sonar, pause with "
          "state restore", "HandleInput"],
         ["anas\\torpedo.inc", "Anas",
          "Fires into a free slot, moves shots up, retires shots at the top",
@@ -234,67 +188,28 @@ def design() -> list:
     return [
         ("h1", "4.  System Design"),
         ("h2", "4.1  Program Flowchart"),
-        ("p", "Figure 1 is the flowchart of the program as implemented. <i>main</i> "
-              "initialises the console and the random generator, loads the high score, "
-              "and then alternates between <i>ShowMenu</i> and a complete round of "
-              "<i>GameLoop</i> until the player chooses option 3. One pass of "
-              "<i>GameLoop</i> is one frame: input is drained, the state byte decides "
-              "which updates run, the frame is composed in memory, only the changed "
-              "cells are written to the console, and <i>FrameDelay</i> waits until "
-              "80 ms have elapsed."),
+        ("p", "Figure 1 is the flowchart of the program as it was built. <i>main</i> sets up the console and the random generator, loads the high score, and then alternates between <i>ShowMenu</i> and a full round of <i>GameLoop</i> until the player chooses option 3. One pass of <i>GameLoop</i> is one frame: the input is read, the state byte decides which updates run, the frame is built in memory, only the changed cells are written to the screen, and <i>FrameDelay</i> waits until 80 ms have passed."),
         ("figure", {"path": "fig_flowchart.png",
                     "caption": "Figure 1: Complete program flowchart as implemented",
                     "width": 5.45}),
         ("h2", "4.2  Module Description"),
-        ("p", "The program is one assembly translation unit, but it is written and "
-              "owned as sixteen module files. <i>game.asm</i> INCLUDEs the others, so "
-              "all procedures share one code segment and one data segment: there is no "
-              "separate assembly, no linker input and no external symbol. Ownership is "
-              "therefore a working rule rather than a linker boundary \u2014 a member "
-              "edits only the files in their own folder, and a change to the shared "
-              "files is agreed before it is merged. Figure 2 shows the three owners and "
-              "the single data segment that connects them."),
+        ("p", "The program is one file as far as the assembler is concerned, but it is written and owned as sixteen module files. game.asm INCLUDEs the rest, so all procedures share one code segment and one data segment, and there is no separate object file and no external symbol. The file split is therefore a team rule, not something the linker enforces: a member edits only the files in their own folder, and a change to the shared files is agreed before it is merged. Figure 2 shows the three owners and the single data segment between them."),
         ("figure", {"path": "fig_modules.png",
                     "caption": "Figure 2: Module ownership and the shared data segment",
-                    "width": 4.95}),
-        ("p", "Figure 3 shows the control states. Six values of the byte "
-              "<i>gameState</i> cover the whole program: MENU (0), PLAYING (1), SONAR "
-              "(2), PAUSED (3), GAME_OVER (4) and EXIT (5). <i>GameLoop</i> reads the "
-              "byte once per frame and dispatches to the update block for that state, "
-              "so adding a state costs one comparison and one block, not a rewrite of "
-              "the loop."),
+                    "width": 5.65}),
+        ("p", "Figure 3 shows the control states. Six values of the byte <i>gameState</i> cover the whole program: MENU (0), PLAYING (1), SONAR (2), PAUSED (3), GAME_OVER (4) and EXIT (5). <i>GameLoop</i> reads the byte once per frame and jumps to the block for that state, so a new state needs one comparison and one block, not a new game loop."),
         ("figure", {"path": "fig_states.png",
                     "caption": "Figure 3: Game-state machine and the transitions "
                                "implemented in HandleInput, UpdateSonar and LoseLife",
-                    "width": 4.95}),
-        ("p", "<b>Objects and frame pipeline.</b> Every game object is a four-byte "
-              "slot: x (centre column), y (row), the active flag and the hidden-mine "
-              "flag. The arrays are <i>Torpedoes</i> (8 slots), <i>Charges</i> (15 "
-              "slots) and <i>Explosions</i> (5 slots), plus a five-byte "
-              "<i>ExplTimer</i>. A fixed four-byte stride makes walking an array a "
-              "plain <i>add esi, 4</i> or a scaled index <i>[esi + ebx*4]</i>, and a "
-              "slot is free when its active byte is zero. Hidden mines are not a "
-              "separate array: they are charge slots whose fourth byte is 1, and only "
-              "<i>BuildFrame</i> reads that byte, so a mine still collides with "
-              "torpedoes and with the submarine. Every frame <i>BuildFrame</i> clears "
-              "the 2000-cell buffer and draws the borders, the hull, the torpedoes, the "
-              "charges (or the mines in SONAR), the explosions and the HUD; <i>Render</i> "
-              "writes only the cells that differ from the previous frame, and "
-              "<i>FrameDelay</i> completes the 80 ms budget. Because the console is "
-              "never cleared during play, an object moves by drawing its new cell and "
-              "blanking its old one, which removes flicker entirely."),
-        ("p", "<b>Module interaction.</b> Table 3 summarises the files, their owner "
-              "and their key procedures. Every dependency runs through the shared data "
-              "segment, which keeps the modules independent: the renderer never calls "
-              "the input handler and the input handler never draws. The only procedure "
-              "that knows about all three owners is <i>GameLoop</i>, which calls one "
-              "update procedure per module in a fixed order."),
+                    "width": 5.65}),
+        ("p", "<b>Objects and drawing.</b> Every game object is a four-byte slot: x (centre column), y (row), the active flag and the hidden-mine flag. The arrays are <i>Torpedoes</i> (8 slots), <i>Charges</i> (15 slots) and <i>Explosions</i> (5 slots), plus a five-byte <i>ExplTimer</i>. Because each slot is four bytes, the next slot is just <i>add esi, 4</i> or <i>[esi + ebx*4]</i>, and a slot is free when its active byte is zero. Hidden mines are not a separate array: they are charge slots with 1 in the fourth byte, and only <i>BuildFrame</i> reads that byte, so a mine still hits torpedoes and the submarine. Every frame <i>BuildFrame</i> clears the 2000-cell buffer and draws the borders, the hull, the torpedoes, the charges (or the mines in SONAR), the explosions and the HUD; <i>Render</i> writes only the cells that changed, and <i>FrameDelay</i> finishes the 80 ms. Because the screen is never cleared during play, an object moves by drawing its new cell and blanking its old one, which is why nothing flickers."),
+        ("p", "<b>Module interaction.</b> Table 3 lists the files, their owner and their main procedures. The modules talk to each other only through the shared data segment: the renderer never calls the input handler and the input handler never draws. The only procedure that knows about all three owners is <i>GameLoop</i>, which calls one update procedure per module in a fixed order."),
         ("table", {
             "caption": "Table 3: Module description",
             "cols": ["File", "Owner", "Responsibility", "Key procedures"],
             "widths": [1.30, 0.55, 2.55, 1.70],
             "rows": modules,
-            "font": 8.0,
+            "font": 8.5,
         }),
     ]
 
@@ -427,7 +342,7 @@ def implementation() -> list:
         ["Arrays and addressing modes",
          "Direct (score), indirect (esi = OFFSET Torpedoes; [esi+2]), base-index "
          "([esi+ebx*4] in the explosion procedures) and scaled (ScreenBuf[ebx*2]) "
-         "addressing; the four-byte stride is walked with ADD esi, 4."],
+         "addressing; the four-byte step is done with ADD esi, 4."],
         ["Procedures and the stack",
          "Forty-two procedures with CALL/RET. Procedures that change registers declare "
          "USES, so arguments can travel in registers and the caller's values survive; "
@@ -463,17 +378,14 @@ def implementation() -> list:
     return [
         ("h1", "5.  Implementation"),
         ("h2", "5.1  Data Segment"),
-        ("p", "All data lives in one segment because the program is one translation "
-              "unit. Each module file opens its own <i>.data</i> block, the assembler "
-              "concatenates them, and a module can use another module's variables "
-              "without any declaration. Table 4 lists the important declarations."),
+        ("p", "All data lives in one segment because the program is one file. Each module file opens its own .data block, the assembler joins them, and a module can use another module's variables without declaring them. Table 4 lists the important declarations."),
         ("table", {
             "caption": "Table 4: Important variables, arrays and constants of the data "
                        "segment",
             "cols": ["Name", "Type", "Purpose"],
             "widths": [1.45, 1.15, 3.60],
             "rows": data_rows,
-            "font": 8.2,
+            "font": 8.5,
         }),
         ("p", "Two details matter for the viva. The buffers hold words, not "
               "characters, because a text-mode cell is a character plus an attribute; "
@@ -483,10 +395,7 @@ def implementation() -> list:
               "Clrscr repaints every cell instead of leaving the old menu on screen, and "
               "<i>InvalidateScreen</i> restores that state."),
         ("h2", "5.2  Procedures"),
-        ("p", "Table 5 lists all forty-two procedures, the file that owns each one, "
-              "what it does and the registers or memory it reads and writes. Registers "
-              "carry a value that already lives in one; shared variables carry a value "
-              "that has to survive across a frame."),
+        ("p", "Table 5 lists all forty-two procedures, the file that owns each one, what it does and the registers or memory it reads and writes. An input is a register when the value is already in one, and a shared variable when it has to last until the next frame."),
         ("table", {
             "caption": "Table 5: Every procedure in the project",
             "cols": ["Procedure", "Module", "Purpose", "Input / output"],
@@ -503,66 +412,24 @@ def implementation() -> list:
             "cols": ["Concept", "Where and how it is used"],
             "widths": [1.40, 4.80],
             "rows": concepts,
-            "font": 8.2,
+            "font": 8.5,
         }),
         ("h2", "5.4  Key Code Segments"),
-        ("p", "<b>Segment 1 \u2014 the frame loop.</b> HandleInput is called first and "
-              "returns immediately when no key is waiting, the state byte decides which "
-              "updates run, and the drawing and timing calls are shared by every state, "
-              "so a paused or sonar frame is still drawn and still paced."),
+        ("p", "<b>Segment 1 \u2014 the frame loop.</b> <i>HandleInput</i> is called first and returns at once when no key is waiting, the state byte decides which updates run, and the drawing and timing calls are shared by every state, so a paused or sonar frame is still drawn and still timed."),
         ("code", {"text": snippet("src/game.asm", 68, 101),
                   "caption": "Code 1: GameLoop state dispatch (src/game.asm)"}),
-        ("p", "The three CMP/JE pairs implement the dispatch and the JMP GameEnded "
-              "fall-through handles GAME_OVER. The order of the update calls matters: "
-              "objects move, a charge may spawn, explosions age, and only then are "
-              "collisions tested, so a shot and a charge that cross in the same frame "
-              "are still detected. <i>FrameDelay</i> then measures the elapsed time with "
-              "GetMseconds and, when the frame took less than 80 ms, negates the "
-              "difference, adds it to 80 and calls Delay for the remainder; if the frame "
-              "already took 80 ms or more the delay is skipped, so the timer never tries "
-              "to catch up by running frames faster."),
-        ("p", "<b>Segment 2 \u2014 the changed-cell renderer.</b> This loop is the "
-              "reason the game does not flicker in a console that has no frame buffer "
-              "of its own."),
+        ("p", "The three CMP/JE pairs choose the block for the current state, and the <i>JMP GameEnded</i> at the end handles GAME_OVER. The order of the update calls matters: the objects move, a charge may spawn, the explosions age, and only then are collisions tested, so a shot and a charge that cross in the same frame are still caught. <i>FrameDelay</i> then measures the elapsed time with GetMseconds, subtracts it from 80 and calls Delay for what is left; if the frame already took 80 ms or more, the delay is skipped, so the timer never tries to catch up by running frames faster."),
+        ("p", "<b>Segment 2 \u2014 the changed-cell renderer.</b> This loop is the reason the game does not flicker in a console that has no frame buffer of its own."),
         ("code", {"text": snippet("src/alyan/render.inc", 154, 176),
                   "caption": "Code 2: Render, the changed-cell loop "
                              "(src/alyan/render.inc)"}),
-        ("p", "The loop walks all 2000 cells with one index in EBX and compares each "
-              "new word with the word the console already shows; equal cells are skipped "
-              "without a library call, which is what makes the renderer cheap. For a "
-              "changed cell the index is divided by 80, so the quotient becomes the row "
-              "and the remainder the column, turning a linear offset back into Gotoxy "
-              "coordinates; AH (the attribute) goes to SetTextColor and AL (the "
-              "character) to WriteChar. The last REP MOVSD copies 1000 dwords \u2014 the "
-              "whole buffer \u2014 into PrevBuf, so the next frame compares against what "
-              "is now on screen."),
-        ("p", "<b>Segment 3 \u2014 collision detection.</b> The torpedo loop is a "
-              "nested loop over the two object arrays, and the comparison itself is a "
-              "signed distance test."),
+        ("p", "The loop walks all 2000 cells with one index in EBX and compares each new word with the word already on the console; equal cells are skipped without a library call, which is what makes the renderer fast. For a changed cell the index is divided by 80, so the quotient becomes the row and the remainder the column, turning a linear offset back into Gotoxy coordinates; AH (the attribute) goes to SetTextColor and AL (the character) to WriteChar. The last REP MOVSD copies the whole buffer into PrevBuf, so the next frame compares against what is now on screen."),
+        ("p", "<b>Segment 3 \u2014 collision detection.</b> The torpedo loop is a nested loop over the two object arrays, and the comparison itself is a signed distance test."),
         ("code", {"text": snippet("src/anas/collision.inc", 16, 30),
                   "caption": "Code 3: Nested torpedo/charge collision test "
                              "(src/anas/collision.inc)"}),
-        ("p", "Both coordinates are widened with MOVZX before the subtraction, because "
-              "a column is a byte but the difference must be able to go negative. After "
-              "SUB the value is a signed distance, so JL and JG are used rather than JB "
-              "and JA, and a difference of \u00b11 (TORP_HIT = CHG_HALF) counts as a hit "
-              "because a charge is three cells wide. The row test accepts the same row "
-              "or one row below, which makes it a crossing test: the shot still hits "
-              "when the two objects step past each other between frames. On a hit both "
-              "slots are freed, AddScore receives 10 or 25 depending on the hidden byte, "
-              "and an explosion and a sound follow. The second half repeats the idea for "
-              "the submarine with a \u00b15 window, so the tapered tip cells are grace "
-              "cells."),
-        ("p", "<b>Segment 4, described in words \u2014 the random generator.</b> "
-              "<i>Rand</i> is the classic linear congruential generator: multiply the "
-              "seed by 1103515245, add 12345, keep the result as the new seed, drop the "
-              "low sixteen bits, which cycle far too quickly, and take the remainder of "
-              "a DIV by the caller's limit. MUL returns a 64-bit product in EDX:EAX but "
-              "only the low half is used, which is exactly the modulo-2^32 arithmetic "
-              "the generator needs. <i>SpawnCharge</i> calls it twice, with 76 to pick a "
-              "column and with 5 to decide the hidden flag, so a fifth of the charges "
-              "are mines, and shifts x by MIN_COL + CHG_HALF because x is the centre of "
-              "a three-cell sprite."),
+        ("p", "Both coordinates are widened with MOVZX before the subtraction, because a column is a byte but the answer must be allowed to go negative. After SUB the value is a signed distance, so JL and JG are used instead of JB and JA, and a difference of \u00b11 (TORP_HIT = CHG_HALF) counts as a hit because a charge is three cells wide. The row test also accepts a charge one row below the shot, so a shot still hits when the two step past each other between frames. On a hit both slots are freed, <i>AddScore</i> gets 10 or 25 depending on the hidden byte, and an explosion and a sound follow. The second half does the same for the submarine with a \u00b15 window, so the narrow tip cells of the hull are grace cells and do not count as a hit."),
+        ("p", "<b>Segment 4 \u2014 the random generator, in words.</b> <i>Rand</i> is the usual linear congruential generator: multiply the seed by 1103515245, add 12345, keep the result as the new seed, drop the low sixteen bits (they repeat too quickly) and take the remainder of a DIV by the caller's limit. MUL puts a 64-bit product in EDX:EAX, but only the low half is used, which is exactly the modulo-2^32 arithmetic the generator needs. <i>SpawnCharge</i> calls it twice, with 76 to pick a column and with 5 to decide the hidden flag, so a fifth of the charges are mines, and shifts x by MIN_COL + CHG_HALF because x is the centre of a three-cell sprite."),
     ]
 
 
@@ -616,14 +483,7 @@ def testing() -> list:
     ]
     return [
         ("h1", "6.  Testing and Results"),
-        ("p", "<b>Test environment.</b> The program was built as a 32-bit Win32 console "
-              "application in Visual Studio 2022 with MASM and Irvine32, and the same "
-              "source was assembled unchanged with MASM 6.14 and linked with LLVM "
-              "lld-link for the routine verification of 3 November 2026. Besides "
-              "interactive play, a separate assembly driver called the real game "
-              "procedures and checked their results with assertions; 1,090 checks "
-              "passed. The manual script is "
-              "<i>docs/testing/acceptance-checklist.md</i>."),
+        ("p", "<b>Test environment.</b> The program was built as a 32-bit Win32 console application in Visual Studio 2022 with MASM and Irvine32, and the same source was assembled unchanged with MASM 6.14 and linked with LLVM lld-link for the routine check of 3 November 2026. Besides playing the game by hand, a separate assembly test program called the real procedures and checked their results with assertions; 1,090 checks passed. The manual script is <i>docs/testing/acceptance-checklist.md</i>."),
         ("h2", "6.1  Test Cases"),
         ("p", "Table 7 lists the test cases that were executed, the input used, the "
               "expected result and the observed result."),
@@ -633,7 +493,7 @@ def testing() -> list:
                      "Actual result", "Result"],
             "widths": [0.35, 1.00, 1.35, 1.55, 1.45, 0.50],
             "rows": cases,
-            "font": 7.3,
+            "font": 8.2,
         }),
         ("h2", "6.2  Screenshots"),
         ("figure", {"path": "fig_gameplay.png",
@@ -645,20 +505,9 @@ def testing() -> list:
                     "caption": "Figure 5: Sonar active \u2014 the five hidden mines are "
                                "drawn as green [!] cells and the HUD shows SONAR "
                                "ACTIVE", "width": 4.55}),
-        ("p", "Figures 4 and 5 show the two states of a round. Each figure was "
-              "produced from the same characters, colours and coordinates that the "
-              "renderer uses (BuildFrame, DrawHUD and screens.inc), so the 80 \u00d7 25 "
-              "layout is exactly the one the program draws."),
+        ("p", "Figures 4 and 5 show the game during play and with the sonar on. Both were drawn with the same characters, colours and positions that the renderer uses (<i>BuildFrame</i>, <i>DrawHUD</i> and screens.inc), so the 80 \u00d7 25 layout is exactly what the program draws."),
         ("h2", "6.3  Verification Summary"),
-        ("p", "Three kinds of evidence were used. The automated harness checked the "
-              "arithmetic that is hard to test by hand: the signed hit windows in "
-              "CheckCollisions, the level formula in AddScore, the coordinate "
-              "arithmetic in PutCell and Render, and the ranges of Rand and "
-              "SpawnCharge. Scripted key sequences drove every state transition, "
-              "including pause during sonar. The manual acceptance checklist covered "
-              "what only a person can judge \u2014 flicker, sound and the feel of the "
-              "movement \u2014 and its two environment items, the speaker test and the "
-              "ten-minute soak, are repeated on the lab machine before the viva."),
+        ("p", "We used three kinds of evidence. The test program checked the arithmetic that is hard to test by hand: the signed hit windows in <i>CheckCollisions</i>, the level formula in <i>AddScore</i>, the coordinate maths in <i>PutCell</i> and <i>Render</i>, and the ranges of <i>Rand</i> and <i>SpawnCharge</i>. Recorded key sequences went through every state change, including pause during sonar. The manual checklist covered what only a person can judge (flicker, sound and the feel of the movement), and its two environment items, the speaker test and the ten-minute continuous run, are repeated on the lab machine before the viva."),
     ]
 
 
@@ -674,19 +523,19 @@ def challenges() -> list:
          "Sprite width, centring offset and hit window were separate numbers in "
          "different files",
          "All widths moved into shared constants (SUB_W, SUB_HALF, CHG_HALF, SUB_HIT, "
-         "TORP_HIT) that drawing, clamping and collision share"],
+         "TORP_HIT) used by drawing, clamping and collision"],
         ["Collision failed for charges left of a shot",
          "The distance was computed on bytes and compared with unsigned jumps, so a "
-         "negative difference looked enormous",
+         "negative answer looked like a huge number",
          "Both coordinates are widened with MOVZX and compared with JL / JG against "
          "\u00b1TORP_HIT"],
         ["Fast charges passed through torpedoes",
          "At high levels a charge moved two rows while the shot moved one, so the two "
-         "never shared a row on the frame that was tested",
-         "The row test also accepts the charge one row below the shot: a crossing test"],
+         "never shared a row when the test ran",
+         "The row test also accepts a charge one row below the shot, so a fast charge cannot pass through"],
         ["Screen flickered when objects moved",
          "Clrscr on every frame erases everything at once and redraws it",
-         "Two word buffers: the console is cleared once per round and only changed cells "
+         "Two word buffers: the screen is cleared once per round, and after that only changed cells "
          "are written after that"],
         ["Movement stuttered, and sound made frames long",
          "A fixed Delay made the frame rate depend on the work, and Beep blocks for its "
@@ -694,30 +543,22 @@ def challenges() -> list:
          "FrameDelay delays only the remainder of the 80 ms, and in-game sounds last 20 "
          "to 30 ms"],
         ["Sonar expired while paused; a bad handle could crash",
-         "sonarStart was a wall-clock stamp, so a pause consumed the reveal; handles and "
-         "byte counts were unchecked",
-         "Unpause adds the paused time to sonarStart; handles and counts are checked and "
-         "saveFailed is reported"],
+         "sonarStart was a real-time stamp, so a pause used up the reveal; handles and "
+         "byte counts were not checked",
+         "Unpause adds the paused time to sonarStart; handles and counts are checked "
+         "now, and saveFailed is reported"],
     ]
     return [
         ("h1", "7.  Challenges and Solutions"),
-        ("p", "Table 8 lists the problems that cost the most time, their real cause and "
-              "the fix that was kept in the submitted source. Most of them are "
-              "low-level: signed versus unsigned comparison, byte-wide arithmetic, "
-              "blocking versus non-blocking calls, and wall-clock time versus game "
-              "time."),
+        ("p", "Table 8 lists the problems that cost us the most time, what really caused them and the fix that is in the final code. Most are low-level: signed against unsigned numbers, byte-sized arithmetic, calls that block, and real time against game time."),
         ("table", {
             "caption": "Table 8: Main development problems and their solutions",
             "cols": ["Problem", "Cause", "Solution"],
             "widths": [1.50, 2.35, 2.35],
             "rows": rows,
-            "font": 8.0,
+            "font": 8.5,
         }),
-        ("p", "The reserved-word problem was the most instructive one. The error "
-              "message points at the line after the label, which makes the listing look "
-              "correct and the diagnostic look wrong; only the assembler's keyword list "
-              "explains it. The team now treats reserved words as part of the naming "
-              "rules, in the same way as a language keyword."),
+        ("p", "The label problem taught us the most. The error points at the line after the label, so the code looks right and the message looks wrong; only the assembler's keyword list explains it. We now check every name against the reserved words before we use it."),
     ]
 
 
@@ -727,17 +568,17 @@ def changes() -> list:
         ["Sprites",
          "'U' submarine and '*' charges",
          "Eleven-cell hull '<=-[ooo]-=>' with a '_!_' sail, '(@)' charges, '[!]' mines",
-         "A one-line sprite with a clear bow and propeller reads better in a text "
+         "A one-line sprite with a clear bow and propeller looks better in a text "
          "console, and an odd width keeps the object centred on its x"],
         ["Object layout",
          "A GameObject STRUCT (x, y, active, hidden)",
          "Four-byte slots in three BYTE arrays with documented offsets 0 to 3",
-         "The same addressing modes apply, but a flat array needs no structure type "
-         "and a slot can be walked with ADD esi, 4 or indexed as [esi+ebx*4]"],
+         "A flat array needs no structure type "
+         "and still uses the same addressing modes (ADD esi, 4 or [esi+ebx*4])"],
         ["Procedure interface", "PROTO / INVOKE with parameters",
          "Register and shared-memory arguments with USES and one LOCAL buffer",
-         "The program is one translation unit, so no prototype is needed; registers "
-         "keep the procedures short and avoid stack frames the team would have to "
+         "The program is one file, so no prototype is needed; registers "
+         "keep the procedures short and avoid stack frames we would have to "
          "explain"],
         ["Renderer", "An optional REPE CMPSW fast path for finding changes",
          "A CMP/JE loop over 2000 words plus REP MOVSD to copy the frame",
@@ -750,22 +591,18 @@ def changes() -> list:
          "Three-frame firing cooldown, five-cell grace window on the hull, pause during "
          "sonar with time compensation, new-record and save-error messages",
          "Each came out of testing: the cooldown stops key auto-repeat from emptying "
-         "the array, the grace window removes unfair tip hits, and the pause fix keeps "
-         "the sonar timer honest"],
+         "the array, the grace window stops unfair hits on the hull tips, and the pause "
+         "fix keeps the sonar timer correct"],
     ]
     return [
         ("h1", "8.  Changes from the Proposal"),
-        ("p", "The scope, the objectives and the architecture of the proposal were "
-              "kept. Table 9 lists what changed after the proposal was approved, with "
-              "the reason for each change. Everything the proposal placed out of scope "
-              "(graphics, mouse, networking, DOS/BIOS interrupts, saved games, "
-              "hand-designed levels) is still out of scope."),
+        ("p", "We kept the scope, the objectives and the design of the proposal. Table 9 lists what changed after it was approved, with the reason for each change. Everything the proposal left out (graphics, mouse, networking, DOS/BIOS interrupts, saved games, hand-made levels) is still out."),
         ("table", {
             "caption": "Table 9: Changes from the proposal",
             "cols": ["Area", "Proposal", "What was implemented", "Reason"],
             "widths": [1.10, 1.45, 1.95, 1.70],
             "rows": rows,
-            "font": 8.2,
+            "font": 8.5,
         }),
     ]
 
@@ -789,16 +626,13 @@ def contributions() -> list:
     ]
     return [
         ("h1", "9.  Individual Contribution"),
-        ("p", "Work was divided by folder, as recorded in the proposal and in "
-              "CONTRIBUTING.md, and every change reached <i>main</i> through a pull "
-              "request that another member reviewed. Testing and this report were joint "
-              "work, and each member can explain the whole game loop."),
+        ("p", "Work was divided by folder, as the proposal and CONTRIBUTING.md say, and every change reached <i>main</i> through a pull request that another member reviewed. Testing and this report were joint work, and each member can explain the whole game loop."),
         ("table", {
             "caption": "Table 10: Individual contribution",
             "cols": ["Member", "Contribution", "Share"],
             "widths": [1.45, 4.15, 0.60],
             "rows": rows,
-            "font": 9.0,
+            "font": 8.5,
         }),
     ]
 
@@ -807,33 +641,11 @@ def contributions() -> list:
 def ai_and_conclusion() -> list:
     return [
         ("h1", "10.  Use of AI Tools"),
-        ("p", "AI assistants were used, and their use is declared here in line with "
-              "the course policy. They (i) scaffolded the repository, the project file "
-              "and the shared constant and data files, (ii) reviewed modules for defects "
-              "such as the signed-comparison bug and the reserved-word labels, (iii) "
-              "drafted and edited documentation, this report included, and (iv) wrote "
-              "the assembly test harness behind the 1,090 checks. No code was copied "
-              "from another student, a previous semester or a published game, and every "
-              "member can explain every line of the submitted source."),
+        ("p", "We used AI assistants, and we declare it here as the course policy requires. They (i) set up the repository, the project file and the shared constant and data files, (ii) checked modules and found bugs such as the signed-comparison bug and the reserved-word labels, (iii) helped to write and edit the documentation, this report included, and (iv) wrote the test program behind the 1,090 checks. No code was copied from another student, from an earlier semester or from a published game, and every member can explain every line of the submitted code."),
         ("h1", "11.  Conclusion and Future Work"),
-        ("p", "The project met all five objectives. Depth Charge is a complete, "
-              "playable game written entirely in 32-bit x86 assembly language: a menu, a "
-              "main loop paced by GetMseconds, fifteen falling objects with a "
-              "hidden-mine flag, eight torpedoes with a cooldown, two collision tests "
-              "with signed hit windows, a five-frame explosion, a sonar system with a "
-              "two-second reveal and a ten-second cooldown, nine levels, five sounds, a "
-              "status bar and a high score that survives a restart."),
-        ("p", "What the team learned is the difference between code that looks "
-              "correct and code that behaves correctly: a CMP on two bytes and the JL "
-              "that follows it disagree unless both operands are widened first, and a "
-              "blocking Beep call costs a whole frame. The two-buffer renderer also "
-              "taught the value of separating the model from the picture: the logic "
-              "never needs to know whether a mine is drawn."),
-        ("p", "<b>Future work.</b> (i) Keep the top ten scores in a fixed-record file; "
-              "(ii) draw a sonar energy bar instead of a countdown number; (iii) replace "
-              "the blocking Beep calls with asynchronous sound; (iv) add a two-player "
-              "split screen, which the fixed arrays already support; and (v) add "
-              "hand-designed levels on top of the delay tables."),
+        ("p", "The project met all five objectives. Depth Charge is a complete, playable game written completely in 32-bit x86 assembly language: a menu, a main loop timed by GetMseconds, fifteen falling objects with a hidden-mine flag, eight torpedoes with a cooldown, two collision tests with signed hit windows, a five-frame explosion, a sonar system with a two-second reveal and a ten-second cooldown, nine levels, five sounds, a status bar and a high score that survives a restart."),
+        ("p", "The biggest lesson was the difference between code that looks right and code that runs right: a CMP on two bytes and the JL after it disagree unless both values are widened first, and one blocking Beep call costs a whole frame. The two-buffer renderer also showed us the value of keeping the model and the picture apart: the game logic never needs to know whether a mine is drawn."),
+        ("p", "<b>Future work.</b> (i) Keep the top ten scores in a fixed-record file; (ii) draw a sonar energy bar instead of a countdown number; (iii) replace the blocking Beep calls with sound that does not block the frame; (iv) add a two-player split screen, which the fixed arrays already support; and (v) add hand-made levels on top of the delay tables."),
         ("h1", "References"),
         ("refs", [
             "[1]  K. R. Irvine, <i>Assembly Language for x86 Processors</i>, 8th ed. "
@@ -886,7 +698,7 @@ def appendix() -> list:
         ("p", "The complete source of the submitted project follows, in the same order "
               "as the INCLUDE list in <i>game.asm</i>. The code is reproduced exactly "
               "as it appears in the submitted <i>.zip</i> file "
-              "(COAL_Code_BCS-3C_<GroupID>.zip): one translation unit, game.asm, which "
+              "(COAL_Code_BCS-3C_<GroupID>.zip): one program file, game.asm, which "
               "INCLUDEs the shared files and then the fourteen module files."),
     ]
     for path, desc in SOURCE_FILES:
