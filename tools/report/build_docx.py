@@ -335,9 +335,10 @@ def add_code(doc: Document, text: str, caption: str | None, size=8.5) -> None:
         pf.space_before = Pt(0)
         pf.space_after = Pt(0)
         pf.line_spacing = 1.0
-        pf.left_indent = Inches(0.08)
+        pf.left_indent = Inches(0.05 if size < 7 else 0.08)
         pf.first_line_indent = Inches(0)
-        shade(p, CODE_FILL)
+        if size >= 6.5:
+            shade(p, CODE_FILL)
         set_run_font(p.add_run(line if line.strip() else " "), CODE_FONT, size)
     if caption:
         add_caption(doc, caption)
@@ -393,8 +394,8 @@ def add_refs(doc: Document, items: list[str]) -> None:
         pf.left_indent = Inches(0.45)
         pf.first_line_indent = Inches(-0.45)
         pf.space_after = Pt(1)
-        pf.line_spacing = 1.15
-        add_rich(p, item, size=11)
+        pf.line_spacing = 1.12
+        add_rich(p, item, size=10.2)
 
 
 def add_body(doc: Document, text: str) -> None:
@@ -420,7 +421,24 @@ def render(doc: Document, blocks: list) -> None:
         elif kind == "figure":
             add_figure(doc, payload)
         elif kind == "code":
-            add_code(doc, payload["text"], payload.get("caption"))
+            add_code(doc, payload["text"], payload.get("caption"),
+                     size=payload.get("size", 8.5))
+        elif kind == "newtemplate":
+            section = doc.add_section(WD_SECTION.NEW_PAGE)
+            sect = section._sectPr
+            cols = sect.find(qn("w:cols"))
+            if cols is None:
+                cols = OxmlElement("w:cols")
+                sect.append(cols)
+            cols.set(qn("w:num"), "2")
+            cols.set(qn("w:space"), "300")
+        elif kind == "codehead":
+            head = doc.add_paragraph()
+            head.paragraph_format.space_before = Pt(6)
+            head.paragraph_format.space_after = Pt(2)
+            head.paragraph_format.line_spacing = 1.0
+            head.paragraph_format.keep_with_next = True
+            set_run_font(head.add_run(payload), CODE_FONT, 7.5, bold=True)
         elif kind == "codefile":
             path = os.path.join(content.ROOT, payload["path"])
             head = doc.add_paragraph()
