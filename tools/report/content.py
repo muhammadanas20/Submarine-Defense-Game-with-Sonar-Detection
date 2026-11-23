@@ -1,15 +1,3 @@
-"""Report content for the Depth Charge final report (EL-2003 COAL Lab, Fall 2026).
-
-One block list is rendered to both .docx and .pdf so the two files cannot drift
-apart.  Block kinds:
-
-    ("h1", text) ("h2", text) ("p", text) ("bullets", [text, ...])
-    ("table", {caption, cols, widths, rows, font})
-    ("figure", {path, caption, width})
-    ("code", {text, caption})
-    ("pagebreak", None) ("spacer", points) ("refs", [...])
-"""
-
 from __future__ import annotations
 
 import os
@@ -30,10 +18,8 @@ MEMBERS = [
     ("Ali Raza", "25K-0827", "Member 3"),
 ]
 
-# all roll numbers in one line for the cover page
 STUDENT_IDS = ", ".join(roll for _name, roll, _role in MEMBERS)
 
-# file names of the two deliverables (no group id any more)
 REPORT_NAME = "COAL_FinalReport_%s" % SECTION
 CODE_ZIP_NAME = "COAL_Code_%s.zip" % SECTION
 
@@ -48,7 +34,6 @@ def snippet(path: str, first: int, last: int) -> str:
     return "\n".join(lines[first - 1:last])
 
 
-# ---------------------------------------------------------------------------
 def cover_and_front() -> list:
     return [
         ("cover", None),
@@ -64,7 +49,6 @@ def cover_and_front() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def introduction() -> list:
     return [
         ("h1", "1.  Introduction"),
@@ -74,7 +58,6 @@ def introduction() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def objectives() -> list:
     rows = [
         ["1", "Keyboard-controlled submarine (A/D or arrow keys) with boundary "
@@ -108,7 +91,6 @@ def objectives() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def tools() -> list:
     rows = [
         ["Assembler and IDE", "Microsoft MASM (ml.exe, 32-bit, .model flat, stdcall) "
@@ -146,7 +128,6 @@ def tools() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def design() -> list:
     modules = [
         ["game.asm", "Anas",
@@ -220,7 +201,6 @@ def design() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def implementation() -> list:
     data_rows = [
         ["gameState", "BYTE", "Current state: MENU, PLAYING, SONAR, PAUSED, "
@@ -439,7 +419,6 @@ def implementation() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def testing() -> list:
     cases = [
         ["1", "Build", "Ctrl+Shift+B in Debug | Win32",
@@ -517,7 +496,6 @@ def testing() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def challenges() -> list:
     rows = [
         ["error A2008 on the line <i>after</i> a label",
@@ -568,7 +546,6 @@ def challenges() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def changes() -> list:
     rows = [
         ["Sprites",
@@ -613,7 +590,6 @@ def changes() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def contributions() -> list:
     rows = [
         ["Muhammad Anas\n(Group Leader, 25K-0899)",
@@ -643,7 +619,6 @@ def contributions() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 def ai_and_conclusion() -> list:
     return [
         ("h1", "10.  Use of AI Tools"),
@@ -680,7 +655,6 @@ def ai_and_conclusion() -> list:
     ]
 
 
-# ---------------------------------------------------------------------------
 SOURCE_FILES = [
     ("src/game.asm", "Main program, game loop, timer"),
     ("src/shared/constants.inc", "Screen geometry"),
@@ -701,9 +675,7 @@ SOURCE_FILES = [
 ]
 
 
-
 def strip_comments(text: str, wrap: int = 62) -> str:
-    """Remove ; comments and blank lines and wrap very long lines."""
     out = []
     for raw in text.splitlines():
         kept, quoted = [], False
@@ -727,7 +699,6 @@ def strip_comments(text: str, wrap: int = 62) -> str:
 
 
 def appendix() -> list:
-    """The complete source, comments removed, set in two columns."""
     blocks = [
         ("newtemplate", "two"),
         ("h1", "Appendix A: Complete Source Code"),

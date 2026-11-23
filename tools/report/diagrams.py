@@ -1,6 +1,3 @@
-"""Draw Figure 1 (program flowchart), Figure 2 (state machine) and Figure 3
-(module / data interaction) for the Depth Charge final report."""
-
 from __future__ import annotations
 
 import os
@@ -10,7 +7,7 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from flow import arrow, box, new_figure, polyline, save  # noqa: E402
+from flow import arrow, box, new_figure, polyline, save
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.abspath(os.path.join(HERE, "..", "..", "docs", "submission", "assets"))
@@ -18,17 +15,14 @@ OUT = os.path.abspath(os.path.join(HERE, "..", "..", "docs", "submission", "asse
 MUTED = "#5a5a5a"
 
 
-# ---------------------------------------------------------------------------
-# Figure 1 - complete program flowchart
-# ---------------------------------------------------------------------------
 def figure_flowchart(path: str) -> None:
     fig, ax = new_figure(6.6, 9.05)
 
-    SX, SW = 1.82, 2.42           # spine (main loop)
-    ROW = [1.25, 3.28, 5.31]      # three state boxes
+    SX, SW = 1.82, 2.42
+    ROW = [1.25, 3.28, 5.31]
     RW = 1.80
     LEFT_RAIL, RIGHT_RAIL = 0.14, 6.46
-    RX, RW2 = 5.05, 2.55          # right column (menu branches)
+    RX, RW2 = 5.05, 2.55
 
     def cx(r):
         return (r[0] + r[2]) / 2
@@ -89,25 +83,21 @@ def figure_flowchart(path: str) -> None:
     v(b["menu"], b["choice"])
     v(b["choice"], b["game"], label="1", dx=0.05)
 
-    # menu choice 2 -> instructions -> back to the menu
     polyline(ax, [(2.82, 6.46), (3.14, 6.46), (3.14, 6.60), (b["instr"][0], 6.60)],
              label="2", label_at=(2.84, 6.50), label_dx=0.02, label_dy=0.03)
     polyline(ax, [(cx(b["instr"]), b["instr"][3]), (cx(b["instr"]), 7.02),
                   (3.03, 7.02)],
              label="back to menu", label_at=(4.35, 7.08), label_dx=0.0, label_dy=0.0)
 
-    # menu choice 3 / ESC -> End
     polyline(ax, [(2.70, 6.28), (3.45, 6.28), (3.45, 5.42), (b["end"][0], 5.42)],
              label="3 / ESC", label_at=(3.48, 6.20), label_dx=0.02, label_dy=0.03)
 
     v(b["game"], b["input"])
     v(b["input"], b["state"])
 
-    # state fan-out (no labels: each box states its own name)
     for i, key in enumerate(("play", "sonar", "pause")):
         arrow(ax, (SX, b["state"][1]), (ROW[i], b[key][3]))
 
-    # state fan-in to the shared drawing pipeline
     bus_y = 2.72
     for i, key in enumerate(("play", "sonar", "pause")):
         ax.plot([ROW[i], ROW[i]], [b[key][1], bus_y], color=MUTED, lw=0.9, zorder=2)
@@ -118,7 +108,6 @@ def figure_flowchart(path: str) -> None:
     v(b["render"], b["delay"])
     v(b["delay"], b["over"])
 
-    # "no" -> next frame (left rail up to HandleInput)
     polyline(ax, [(b["over"][0], 0.46), (LEFT_RAIL, 0.46), (LEFT_RAIL, 4.70),
                   (b["input"][0], 4.70)], label=None)
     ax.text(LEFT_RAIL + 0.05, 2.05, "next frame", fontsize=6.0, color=MUTED,
@@ -126,7 +115,6 @@ def figure_flowchart(path: str) -> None:
     ax.text(b["over"][0] - 0.06, 0.62, "no", fontsize=6.2, color=MUTED,
             ha="right", va="center")
 
-    # "yes" -> game over screen -> back to the menu
     arrow(ax, (b["over"][2], 0.46), (b["go"][0], 0.46), label="yes",
           label_dx=-0.02, label_dy=0.09)
     polyline(ax, [(cx(b["go"]), b["go"][3] + 0.02), (cx(b["go"]), 0.80),
@@ -138,9 +126,6 @@ def figure_flowchart(path: str) -> None:
     save(fig, path)
 
 
-# ---------------------------------------------------------------------------
-# Figure 2 - game-state machine
-# ---------------------------------------------------------------------------
 def figure_state_machine(path: str) -> None:
     fig, ax = new_figure(6.4, 3.55)
     MUTED = "#5a5a5a"
@@ -159,31 +144,24 @@ def figure_state_machine(path: str) -> None:
     b["exit"] = box(ax, 5.42, 0.55, 1.30, 0.40, "EXIT\nST_EXIT = 5", "term",
                     shape="term", fs=7.2, bold_first=True)
 
-    # MENU -> PLAYING (1) on the upper lane, PLAYING -> SONAR on the same lane
     arrow(ax, (b["menu"][2], 2.92), (b["play"][0], 2.92), label="1",
           label_dx=-0.12, label_dy=0.05)
     arrow(ax, (b["play"][2], 2.92), (b["sonar"][0], 2.92), label="SPACE",
           label_dx=-0.16, label_dy=0.10)
-    # SONAR -> PLAYING on the lower lane
     arrow(ax, (b["sonar"][0], 2.64), (b["play"][2], 2.64),
           label="after 2000 ms", label_dx=-0.55, label_dy=-0.11)
 
-    # PLAYING <-> PAUSED
     arrow(ax, (2.90, b["play"][1]), (2.90, b["pause"][3]), label="P",
           label_dx=0.05, label_dy=0.0)
     arrow(ax, (3.52, b["pause"][3]), (3.52, b["play"][1]),
           label="P: restore stateBeforePause", label_dx=0.06, label_dy=0.0)
-    # SONAR -> PAUSED
     polyline(ax, [(4.95, b["sonar"][1]), (4.95, 1.50), (b["pause"][2], 1.50)],
              label="P", label_at=(4.97, 1.56), label_dx=0.02, label_dy=0.02)
-    # PLAYING -> GAME_OVER (lives = 0)
     polyline(ax, [(b["play"][0], 2.70), (2.10, 2.70), (2.10, 0.55),
                   (b["over"][2], 0.55)], label="lives = 0",
              label_at=(2.12, 1.90), label_dx=0.05, label_dy=0.0)
-    # GAME_OVER -> MENU (any key)
     arrow(ax, (0.60, b["over"][3]), (0.60, b["menu"][1]), label="any key",
           label_dx=0.06, label_dy=0.0)
-    # MENU -> EXIT
     polyline(ax, [(b["menu"][0], 2.78), (0.10, 2.78), (0.10, 0.20),
                   (5.42, 0.20), (5.42, b["exit"][1])], label="3 or ESC",
              label_at=(0.14, 1.60), label_dx=0.0, label_dy=0.0)
@@ -197,9 +175,6 @@ def figure_state_machine(path: str) -> None:
     save(fig, path)
 
 
-# ---------------------------------------------------------------------------
-# Figure 3 - module ownership and shared data
-# ---------------------------------------------------------------------------
 def figure_modules(path: str) -> None:
     fig, ax = new_figure(6.5, 3.10)
     MUTED = "#5a5a5a"

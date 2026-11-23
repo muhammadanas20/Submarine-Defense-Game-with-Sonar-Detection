@@ -1,12 +1,3 @@
-"""Render figure images for the Depth Charge final report.
-
-The console figures are reconstructions: every character, colour and screen
-position is taken from the real drawing code in src/ (alyang/render.inc,
-alyan/hud.inc, ali/screens.inc), so each image is exactly what BuildFrame,
-DrawHUD, ShowMenu, ShowInstructions and GameOverScreen put on an 80x25 console
-for the given game state.
-"""
-
 from __future__ import annotations
 
 import os
@@ -20,15 +11,14 @@ FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
 
 SCREEN_W, SCREEN_H = 80, 25
 
-# Irvine32 / VGA text-mode palette (SetTextColor values used by the game)
 PALETTE = {
-    0: (12, 12, 12),        # black
-    7: (170, 170, 170),     # lightGray  ATTR_TEXT
-    9: (85, 85, 255),       # lightBlue  ATTR_BORDER
-    10: (85, 255, 85),      # lightGreen ATTR_SUB / ATTR_MINE
-    11: (85, 255, 255),     # lightCyan  ATTR_TORP
-    12: (255, 85, 85),      # lightRed   ATTR_CHARGE
-    14: (255, 255, 85),     # yellow     ATTR_HUD
+    0: (12, 12, 12),
+    7: (170, 170, 170),
+    9: (85, 85, 255),
+    10: (85, 255, 85),
+    11: (85, 255, 255),
+    12: (255, 85, 85),
+    14: (255, 255, 85),
 }
 ATTR_TEXT, ATTR_SUB, ATTR_TORP, ATTR_CHARGE, ATTR_MINE = 7, 10, 11, 12, 10
 ATTR_HUD, ATTR_BORDER = 14, 9
@@ -50,7 +40,6 @@ class Screen:
         for i, ch in enumerate(text):
             self.put_cell(row, col + i, ch, color)
 
-    # ---- game drawing routines (mirrors of the assembly procedures) --------
     def clear_buffer(self) -> None:
         for r in range(SCREEN_H):
             for c in range(SCREEN_W):
@@ -96,9 +85,8 @@ class Screen:
                         "A/D MOVE  W FIRE  SPACE SONAR  P PAUSE  ESC MENU",
                         ATTR_BORDER)
 
-    # ---- output -----------------------------------------------------------
     def to_image(self, path: str, title: str | None = None, scale: int = 2) -> None:
-        cw, ch = 9, 19          # cell size in px (before scale)
+        cw, ch = 9, 19
         pad = 6
         w = SCREEN_W * cw + pad * 2
         h = SCREEN_H * ch + pad * 2
@@ -118,9 +106,6 @@ class Screen:
         img.save(path)
 
 
-# --------------------------------------------------------------------------
-# individual figures
-# --------------------------------------------------------------------------
 def figure_menu(path: str) -> None:
     s = Screen()
     s.clear_buffer()
@@ -162,12 +147,10 @@ def figure_gameplay(path: str) -> None:
     s.clear_buffer()
     s.draw_borders()
     s.draw_sub(40)
-    # right side: Scene A -> normal play with a mix of visible charges
     charges = [(12, 4), (30, 6), (52, 5), (68, 8), (22, 12), (44, 10),
                (75, 14), (8, 16), (36, 15), (60, 18), (18, 20), (66, 21)]
     for x, y in charges:
         s.draw_charge(x, y, hidden=False, sonar=False)
-    # hidden mines are invisible during normal play: 3 of the 15 slots
     for x, y in ((26, 9), (48, 17), (70, 12)):
         s.draw_charge(x, y, hidden=True, sonar=False)
     for x, y in ((40, 20), (40, 16), (52, 19)):
@@ -178,7 +161,6 @@ def figure_gameplay(path: str) -> None:
 
 
 def figure_sonar(path: str) -> None:
-    """Same fifteen charge slots as figure_gameplay, five of them mines."""
     s = Screen()
     s.clear_buffer()
     s.draw_borders()

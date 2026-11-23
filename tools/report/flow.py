@@ -1,9 +1,3 @@
-"""Flowchart / diagram helpers for the Depth Charge final report.
-
-All geometry is in inches so that the fonts keep their real size when the
-figure is inserted into the Word document at its natural width.
-"""
-
 from __future__ import annotations
 
 import textwrap
@@ -11,8 +5,8 @@ import textwrap
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.patches import (  # noqa: E402
+import matplotlib.pyplot as plt
+from matplotlib.patches import (
     FancyBboxPatch,
     FancyArrowPatch,
     Polygon,
@@ -22,14 +16,14 @@ INK = "#1a1a1a"
 MUTED = "#5a5a5a"
 
 STYLES = {
-    "term": dict(fc="#d9e8d2", ec="#2f6b2f"),      # start / end
-    "proc": dict(fc="#e8eef7", ec="#2f4f7f"),      # process / procedure
-    "data": dict(fc="#fdf3d8", ec="#8a6b1f"),      # data / memory
-    "dec": dict(fc="#f7e6e6", ec="#8a2f2f"),       # decision
-    "io": dict(fc="#ece7f7", ec="#4b3a7f"),        # input / output
+    "term": dict(fc="#d9e8d2", ec="#2f6b2f"),
+    "proc": dict(fc="#e8eef7", ec="#2f4f7f"),
+    "data": dict(fc="#fdf3d8", ec="#8a6b1f"),
+    "dec": dict(fc="#f7e6e6", ec="#8a2f2f"),
+    "io": dict(fc="#ece7f7", ec="#4b3a7f"),
 }
 
-CHAR_W = 0.50   # width of one character as a fraction of the font size
+CHAR_W = 0.50
 
 
 def new_figure(w: float, h: float):
@@ -52,7 +46,6 @@ def _wrap(text: str, width: float, fs: float) -> list[str]:
 
 def box(ax, cx, cy, w, h, text, style="proc", fs=7.2, bold_first=False,
         shape="rect", color=None, text_color=INK, lw=0.9, zorder=3):
-    """Draw a box centred on (cx, cy); returns (x0, y0, x1, y1)."""
     st = STYLES[style]
     fc = color or st["fc"]
     ec = st["ec"]
@@ -108,7 +101,6 @@ def arrow(ax, p1, p2, label=None, fs=6.4, style="-|>", lw=0.9,
 
 def polyline(ax, points, label=None, fs=6.4, color=MUTED, lw=0.9,
              label_at=None, label_dx=0.04, label_dy=0.0):
-    """Orthogonal connector through the given points, arrow on the last leg."""
     pts = list(points)
     for a, b in zip(pts[:-2], pts[1:-1]):
         ax.plot([a[0], b[0]], [a[1], b[1]], color=color, lw=lw, zorder=2,

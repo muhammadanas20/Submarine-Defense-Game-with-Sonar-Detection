@@ -18,7 +18,6 @@ sonarPlayed    BYTE 0
 stateBeforePause BYTE ST_PLAYING
 pauseStarted   DWORD 0
 
-; har slot: x, y, active, hidden
 Torpedoes BYTE MAX_TORP * 4 DUP(0)
 Charges BYTE MAX_CHARGE * 4 DUP(0)
 Explosions BYTE MAX_EXPL * 4 DUP(0)

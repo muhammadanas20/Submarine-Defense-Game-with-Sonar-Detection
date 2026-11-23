@@ -1,5 +1,3 @@
-"""Build a PDF copy of the report from the same block list as the .docx."""
-
 from __future__ import annotations
 
 import os
@@ -19,7 +17,7 @@ from reportlab.platypus import (BaseDocTemplate, Flowable, Frame, Image,
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import content  # noqa: E402
+import content
 
 OUT = os.path.join(content.ROOT, "docs", "submission")
 
@@ -42,7 +40,6 @@ def esc(text: str) -> str:
 
 
 def rich(text: str) -> str:
-    """Escape XML but keep the report's own <b> and <i> tags."""
     out = []
     for piece in TOKEN.split(text):
         if not piece:
@@ -113,20 +110,12 @@ def header_footer(canvas, doc) -> None:
 
 
 def code_flowable(text: str, size=8.0) -> Preformatted:
-    """Preformatted keeps the layout exactly and does not parse XML tags, which
-    is what source code needs (<, > and & must stay literal)."""
     style = ParagraphStyle("code%d" % int(size * 10), parent=STYLES["code"],
                            fontSize=size, leading=size * 1.2)
     return Preformatted(text, style)
 
 
 class CaptionedTable(Flowable):
-    """A table caption and its table that never get separated.
-
-    When the pair does not fit, the table is split by rows and the caption
-    travels with the first part; if even the header would not fit, the whole
-    block moves to the next page.
-    """
 
     def __init__(self, caption, table):
         Flowable.__init__(self)
@@ -147,14 +136,12 @@ class CaptionedTable(Flowable):
         if availHeight >= self._height:
             return [self]
         room = availHeight - self._cap_h
-        if room < 3 * 12:                      # caption and almost nothing else
+        if room < 3 * 12:
             return []
         parts = self.table.split(availWidth, room)
         rows = getattr(parts[0], "_cellvalues", None) if parts else None
-        if not parts or rows is None or len(rows) < 3:   # header + 2 rows
-            return []                          # let the block start a new page
-        # hand the caption and the whole table back to the frame; the table
-        # splits itself with one repeated header row
+        if not parts or rows is None or len(rows) < 3:
+            return []
         return [self.caption, self.table]
 
     def draw(self):
@@ -298,7 +285,6 @@ def render(blocks: list) -> list:
         elif kind == "figure":
             fig = figure_flowable(payload)
             head = flow[-1] if flow else None
-            # a heading must never be left alone at the bottom of a page
             if head is not None and getattr(head, "style", None) is not None \
                     and head.style.name in ("h1", "h2"):
                 flow.pop()
