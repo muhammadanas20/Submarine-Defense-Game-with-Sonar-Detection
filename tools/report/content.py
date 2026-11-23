@@ -102,7 +102,7 @@ def objectives() -> list:
             "cols": ["No.", "Objective", "Status"],
             "widths": [0.45, 4.35, 1.30],
             "rows": rows,
-            "font": 8.5,
+            "font": 8.8,
         }),
         ("p", "* FrameDelay keeps every frame at 80 ms or more, so the game runs at about 12.5 frames per second on any CPU, and the two-buffer renderer writes only the cells that changed, so nothing flickers. A frame gets a little longer than 80 ms when a Beep call blocks inside it, so the game sounds were kept to 20\u201330 ms and the long game-over tune plays only on the game-over screen. Everything the proposal put out of scope (graphics mode, mouse, multiplayer, networking, BIOS/DOS interrupts, saved games and hand-made levels) is still out."),
     ]
@@ -141,7 +141,7 @@ def tools() -> list:
             "cols": ["Tool", "Version / name", "Purpose in this project"],
             "widths": [1.10, 2.60, 2.40],
             "rows": rows,
-            "font": 8.5,
+            "font": 8.8,
         }),
     ]
 
@@ -202,12 +202,12 @@ def design() -> list:
         ("p", "The program is one file as far as the assembler is concerned, but it is written and owned as sixteen module files. game.asm INCLUDEs the rest, so all procedures share one code segment and one data segment, and there is no separate object file and no external symbol. The file split is therefore a team rule, not something the linker enforces: a member edits only the files in their own folder, and a change to the shared files is agreed before it is merged. Figure 2 shows the three owners and the single data segment between them."),
         ("figure", {"path": "fig_modules.png",
                     "caption": "Figure 2: Module ownership and the shared data segment",
-                    "width": 5.65}),
+                    "width": 5.9}),
         ("p", "Figure 3 shows the control states. Six values of the byte <i>gameState</i> cover the whole program: MENU (0), PLAYING (1), SONAR (2), PAUSED (3), GAME_OVER (4) and EXIT (5). <i>GameLoop</i> reads the byte once per frame and jumps to the block for that state, so a new state needs one comparison and one block, not a new game loop."),
         ("figure", {"path": "fig_states.png",
                     "caption": "Figure 3: Game-state machine and the transitions "
                                "implemented in HandleInput, UpdateSonar and LoseLife",
-                    "width": 5.65}),
+                    "width": 5.9}),
         ("p", "<b>Objects and drawing.</b> Every game object is a four-byte slot: x (centre column), y (row), the active flag and the hidden-mine flag. The arrays are <i>Torpedoes</i> (8 slots), <i>Charges</i> (15 slots) and <i>Explosions</i> (5 slots), plus a five-byte <i>ExplTimer</i>. Because each slot is four bytes, the next slot is just <i>add esi, 4</i> or <i>[esi + ebx*4]</i>, and a slot is free when its active byte is zero. Hidden mines are not a separate array: they are charge slots with 1 in the fourth byte, and only <i>BuildFrame</i> reads that byte, so a mine still hits torpedoes and the submarine. Every frame <i>BuildFrame</i> clears the 2000-cell buffer and draws the borders, the hull, the torpedoes, the charges (or the mines in SONAR), the explosions and the HUD; <i>Render</i> writes only the cells that changed, and <i>FrameDelay</i> finishes the 80 ms. Because the screen is never cleared during play, an object moves by drawing its new cell and blanking its old one, which is why nothing flickers."),
         ("p", "<b>Module interaction.</b> Table 3 lists the files, their owner and their main procedures. The modules talk to each other only through the shared data segment: the renderer never calls the input handler and the input handler never draws. The only procedure that knows about all three owners is <i>GameLoop</i>, which calls one update procedure per module in a fixed order."),
         ("table", {
@@ -215,7 +215,7 @@ def design() -> list:
             "cols": ["File", "Owner", "Responsibility", "Key procedures"],
             "widths": [1.30, 0.55, 2.55, 1.70],
             "rows": modules,
-            "font": 8.5,
+            "font": 8.6,
         }),
     ]
 
@@ -391,7 +391,7 @@ def implementation() -> list:
             "cols": ["Name", "Type", "Purpose"],
             "widths": [1.45, 1.15, 3.60],
             "rows": data_rows,
-            "font": 8.5,
+            "font": 8.6,
         }),
         ("p", "Two details matter for the viva. The buffers hold words, not "
               "characters, because a text-mode cell is a character plus an attribute; "
@@ -407,7 +407,7 @@ def implementation() -> list:
             "cols": ["Procedure", "Module", "Purpose", "Input / output"],
             "widths": [1.12, 1.06, 2.50, 1.52],
             "rows": proc_rows,
-            "font": 8.0,
+            "font": 8.3,
         }),
         ("h2", "5.3  Assembly Language Concepts Used"),
         ("p", "Table 6 maps each concept of the course outline to the place in the "
@@ -418,7 +418,7 @@ def implementation() -> list:
             "cols": ["Concept", "Where and how it is used"],
             "widths": [1.40, 4.80],
             "rows": concepts,
-            "font": 8.5,
+            "font": 8.6,
         }),
         ("h2", "5.4  Key Code Segments"),
         ("p", "<b>Segment 1 \u2014 the frame loop.</b> <i>HandleInput</i> is called first and returns at once when no key is waiting, the state byte decides which updates run, and the drawing and timing calls are shared by every state, so a paused or sonar frame is still drawn and still timed."),
@@ -499,19 +499,19 @@ def testing() -> list:
                      "Actual result", "Result"],
             "widths": [0.35, 1.00, 1.35, 1.55, 1.45, 0.50],
             "rows": cases,
-            "font": 8.2,
+            "font": 8.5,
         }),
         ("h2", "6.2  Screenshots"),
+        ("p", "Figures 4 and 5 show the game during play and with the sonar on. Both were drawn with the same characters, colours and positions that the renderer uses (<i>BuildFrame</i>, <i>DrawHUD</i> and screens.inc), so the 80 \u00d7 25 layout is exactly what the program draws."),
         ("figure", {"path": "fig_gameplay.png",
                     "caption": "Figure 4: Normal play \u2014 HUD, borders, hull with "
                                "sail, three torpedoes, twelve visible charges and one "
                                "explosion (three hidden mines are present but not "
-                               "drawn)", "width": 4.55}),
+                               "drawn)", "width": 5.4}),
         ("figure", {"path": "fig_sonar.png",
                     "caption": "Figure 5: Sonar active \u2014 the five hidden mines are "
                                "drawn as green [!] cells and the HUD shows SONAR "
-                               "ACTIVE", "width": 4.55}),
-        ("p", "Figures 4 and 5 show the game during play and with the sonar on. Both were drawn with the same characters, colours and positions that the renderer uses (<i>BuildFrame</i>, <i>DrawHUD</i> and screens.inc), so the 80 \u00d7 25 layout is exactly what the program draws."),
+                               "ACTIVE", "width": 5.4}),
         ("h2", "6.3  Verification Summary"),
         ("p", "We used three kinds of evidence. The test program checked the arithmetic that is hard to test by hand: the signed hit windows in <i>CheckCollisions</i>, the level formula in <i>AddScore</i>, the coordinate maths in <i>PutCell</i> and <i>Render</i>, and the ranges of <i>Rand</i> and <i>SpawnCharge</i>. Recorded key sequences went through every state change, including pause during sonar. The manual checklist covered what only a person can judge (flicker, sound and the feel of the movement), and its two environment items, the speaker test and the ten-minute continuous run, are repeated on the lab machine before the viva."),
     ]
@@ -562,7 +562,7 @@ def challenges() -> list:
             "cols": ["Problem", "Cause", "Solution"],
             "widths": [1.50, 2.35, 2.35],
             "rows": rows,
-            "font": 8.5,
+            "font": 8.8,
         }),
         ("p", "The label problem taught us the most. The error points at the line after the label, so the code looks right and the message looks wrong; only the assembler's keyword list explains it. We now check every name against the reserved words before we use it."),
     ]
@@ -608,7 +608,7 @@ def changes() -> list:
             "cols": ["Area", "Proposal", "What was implemented", "Reason"],
             "widths": [1.10, 1.45, 1.95, 1.70],
             "rows": rows,
-            "font": 8.5,
+            "font": 8.6,
         }),
     ]
 
@@ -638,7 +638,7 @@ def contributions() -> list:
             "cols": ["Member", "Contribution", "Share"],
             "widths": [1.45, 4.15, 0.60],
             "rows": rows,
-            "font": 8.5,
+            "font": 8.8,
         }),
     ]
 
@@ -682,58 +682,65 @@ def ai_and_conclusion() -> list:
 
 # ---------------------------------------------------------------------------
 SOURCE_FILES = [
-    ("src/game.asm", "Main program, new-game reset, game loop, frame timer"),
-    ("src/shared/constants.inc", "Screen geometry, states, colours, sprite widths"),
-    ("src/shared/data.inc", "Global variables, object arrays, screen buffers"),
-    ("src/anas/input.inc", "Non-blocking keyboard handler, movement, pause"),
-    ("src/anas/torpedo.inc", "Firing and torpedo movement"),
-    ("src/anas/collision.inc", "Torpedo/charge and charge/submarine collisions"),
-    ("src/alyan/render.inc", "Console setup, sprite drawing, frame buffer, renderer"),
-    ("src/alyan/hud.inc", "Status bar, sonar status, pause banner"),
-    ("src/alyan/explosion.inc", "Five-frame ASCII explosion"),
+    ("src/game.asm", "Main program, game loop, timer"),
+    ("src/shared/constants.inc", "Screen geometry"),
+    ("src/shared/data.inc", "Variables and arrays"),
+    ("src/anas/input.inc", "Keyboard, movement, pause"),
+    ("src/anas/torpedo.inc", "Firing and movement"),
+    ("src/anas/collision.inc", "Charge and torpedo hits"),
+    ("src/alyan/render.inc", "Sprite drawing"),
+    ("src/alyan/hud.inc", "Status bar and pause"),
+    ("src/alyan/explosion.inc", "Five-frame explosion"),
     ("src/alyan/sonar.inc", "Sonar reveal and cooldown"),
-    ("src/ali/random.inc", "Linear congruential generator"),
-    ("src/ali/charges.inc", "Charge spawning and falling"),
-    ("src/ali/score.inc", "Score, lives, levels"),
-    ("src/ali/sound.inc", "Sound effects and the sound macro"),
-    ("src/ali/screens.inc", "Menu, instructions, game-over screens"),
+    ("src/ali/random.inc", "Random number generator"),
+    ("src/ali/charges.inc", "Spawning and falling"),
+    ("src/ali/score.inc", "Score, lives and levels"),
+    ("src/ali/sound.inc", "Sound effects and macro"),
+    ("src/ali/screens.inc", "Menus and game over"),
     ("src/ali/highscore.inc", "High-score file"),
 ]
 
 
+
+def strip_comments(text: str, wrap: int = 62) -> str:
+    """Remove ; comments and blank lines and wrap very long lines."""
+    out = []
+    for raw in text.splitlines():
+        kept, quoted = [], False
+        for ch in raw:
+            if ch == '"':
+                quoted = not quoted
+            if ch == ";" and not quoted:
+                break
+            kept.append(ch)
+        line = "".join(kept).rstrip()
+        if not line.strip():
+            continue
+        while len(line) > wrap:
+            cut = line.rfind(" ", 0, wrap + 1)
+            if cut <= wrap // 2:
+                cut = wrap
+            out.append(line[:cut].rstrip())
+            line = "    " + line[cut:].lstrip()
+        out.append(line)
+    return "\n".join(out)
+
+
 def appendix() -> list:
-    """Only an index of the source files: the code itself ships in the .zip."""
-    rows = []
-    total = 0
-    for path, desc in SOURCE_FILES:
-        lines = len(read(path).splitlines())
-        total += lines
-        if path == "src/game.asm" or path.startswith("src/shared") \
-                or path.startswith("src/anas"):
-            owner = "Anas"
-        elif path.startswith("src/alyan"):
-            owner = "Alyan"
-        else:
-            owner = "Ali"
-        rows.append(["<i>%s</i>" % path, str(lines), owner, desc])
-    return [
-        ("pagebreak", None),
-        ("h1", "Appendix A: Source Code"),
-        ("p", "The submitted archive (COAL_Code_BCS-3C.zip) contains the complete "
-              "source: one program file, <i>game.asm</i>, which INCLUDEs the two "
-              "shared files and the fourteen module files. Table 11 lists them with "
-              "their size and owner, so any routine quoted in this report can be "
-              "found quickly. The code itself is not reprinted here."),
-        ("table", {
-            "caption": "Table 11: Source files in the submitted archive",
-            "cols": ["File", "Lines", "Owner", "Contents"],
-            "widths": [1.80, 0.55, 0.65, 3.25],
-            "rows": rows,
-            "font": 8.5,
-        }),
-        ("p", "Together the sixteen files hold %d lines of assembly source, which "
-              "build to one 32-bit console executable." % total),
+    """The complete source, comments removed, set in two columns."""
+    blocks = [
+        ("newtemplate", "two"),
+        ("h1", "Appendix A: Complete Source Code"),
+        ("p", "The complete source follows in the same order as the INCLUDE list in "
+              "<i>game.asm</i>. The comments and the blank lines were removed so that "
+              "the code fits in a few pages; the same files with all their comments "
+              "are in the <i>src</i> folder of the repository."),
     ]
+    for path, desc in SOURCE_FILES:
+        blocks.append(("codehead", "%s \u2014 %s" % (path, desc)))
+        blocks.append(("code", {"text": strip_comments(read(path)), "size": 6.4,
+                                "caption": None}))
+    return blocks
 
 
 def build_blocks() -> list:
