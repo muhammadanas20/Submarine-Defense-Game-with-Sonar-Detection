@@ -31,3 +31,7 @@ highscore.dat
 # OS/editor noise
 .DS_Store
 Thumbs.db
+
+# Python tooling for the report
+__pycache__/
+*.pyc
