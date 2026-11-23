@@ -11,8 +11,9 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import (BaseDocTemplate, Flowable, Frame, Image,
-                                KeepTogether, PageBreak, PageTemplate, Paragraph,
-                                Preformatted, Spacer, Table, TableStyle)
+                                KeepTogether, NextPageTemplate, PageBreak,
+                                PageTemplate, Paragraph, Preformatted, Spacer,
+                                Table, TableStyle)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -75,7 +76,7 @@ STYLES = {
     "code": ParagraphStyle("code", fontName="Courier", fontSize=8, leading=9.6,
                            textColor=INK, backColor=CODE_BG, spaceBefore=0,
                            spaceAfter=0, leftIndent=4, borderPadding=2),
-    "ref": ParagraphStyle("ref", fontName="Times-Roman", fontSize=11, leading=12.6,
+    "ref": ParagraphStyle("ref", fontName="Times-Roman", fontSize=10.2, leading=11.8,
                           leftIndent=32, firstLineIndent=-32, spaceAfter=1,
                           alignment=TA_LEFT, textColor=INK),
     "cover_big": ParagraphStyle("cover_big", fontName="Times-Bold", fontSize=16,
@@ -293,8 +294,9 @@ def render(blocks: list) -> list:
             else:
                 flow.append(fig)
         elif kind == "code":
-            flow.append(Spacer(1, 4))
-            flow.append(code_flowable(payload["text"], 8.0))
+            size = payload.get("size", 8.0)
+            flow.append(Spacer(1, 4 if size >= 8 else 2))
+            flow.append(code_flowable(payload["text"], size))
             if payload.get("caption"):
                 flow.append(Paragraph(rich(payload["caption"]),
                                       STYLES["caption"]))
@@ -317,6 +319,13 @@ def render(blocks: list) -> list:
             flow.extend(cover_flowables())
         elif kind == "signature_table":
             flow.extend(signature_flowables())
+        elif kind == "newtemplate":
+            flow.append(NextPageTemplate(payload))
+            flow.append(PageBreak())
+        elif kind == "codehead":
+            flow.append(Paragraph(esc(payload), ParagraphStyle(
+                "ah", fontName="Courier-Bold", fontSize=7.0, leading=8.6,
+                spaceBefore=10, spaceAfter=3, keepWithNext=1, textColor=INK)))
         elif kind == "pagebreak":
             flow.append(PageBreak())
         elif kind == "spacer":
@@ -335,8 +344,17 @@ def build() -> str:
                           "Hussain, Ali Raza", subject="EL-2003 COAL Lab Fall 2026")
     frame = Frame(MARGIN, MARGIN, FRAME_W, PAGE_H - 2 * MARGIN, id="body",
                   leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
-    doc.addPageTemplates([PageTemplate(id="all", frames=[frame],
-                                       onPage=header_footer)])
+    gutter = 14
+    col_w = (FRAME_W - gutter) / 2.0
+    col_h = PAGE_H - 2 * MARGIN
+    left = Frame(MARGIN, MARGIN, col_w, col_h, id="col1",
+                 leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    right = Frame(MARGIN + col_w + gutter, MARGIN, col_w, col_h, id="col2",
+                  leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    doc.addPageTemplates([
+        PageTemplate(id="all", frames=[frame], onPage=header_footer),
+        PageTemplate(id="two", frames=[left, right], onPage=header_footer),
+    ])
     doc.build(render(content.build_blocks()))
     print("wrote", path)
     return path

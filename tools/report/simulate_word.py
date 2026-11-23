@@ -29,7 +29,18 @@ def main() -> None:
                             build_pdf.PAGE_H - 2 * inch, id="b",
                             leftPadding=0, rightPadding=0, topPadding=0,
                             bottomPadding=0)
-    doc.addPageTemplates([build_pdf.PageTemplate(id="all", frames=[frame])])
+    gutter = 14
+    col_w = (build_pdf.FRAME_W - gutter) / 2.0
+    col_h = build_pdf.PAGE_H - 2 * inch
+    left = build_pdf.Frame(inch, inch, col_w, col_h, id="col1",
+                           leftPadding=0, rightPadding=0, topPadding=0,
+                           bottomPadding=0)
+    right = build_pdf.Frame(inch + col_w + gutter, inch, col_w, col_h, id="col2",
+                            leftPadding=0, rightPadding=0, topPadding=0,
+                            bottomPadding=0)
+    doc.addPageTemplates([build_pdf.PageTemplate(id="all", frames=[frame]),
+                          build_pdf.PageTemplate(id="two",
+                                                 frames=[left, right])])
     doc.build(build_pdf.render(content.build_blocks()))
 
     pdf = pymupdf.open(POST)
