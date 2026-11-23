@@ -1,6 +1,5 @@
 .code
 
-; khali slot mein naya charge rakho
 SpawnCharge PROC USES eax ecx esi
     dec  spawnTimer
     jnz  Done
@@ -17,9 +16,6 @@ FindSlot:
     jmp  Done
 
 Found:
-    ; x is the sprite's centre: keep the whole charge (CHG_HALF cells on each
-    ; side) inside the borders, so x runs from MIN_COL + CHG_HALF to
-    ; MAX_COL - CHG_HALF
     mov  eax, MAX_COL - MIN_COL - 2 * CHG_HALF + 1
     call Rand
     add  al, MIN_COL + CHG_HALF

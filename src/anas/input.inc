@@ -29,14 +29,14 @@ Extended:
 KeyLeft:
     cmp  gameState, ST_PLAYING
     jne  NextKey
-    cmp  subX, MIN_COL + SUB_HALF     ; hull ka left tip border ke andar rahe
+    cmp  subX, MIN_COL + SUB_HALF
     jbe  NextKey
     dec  subX
     jmp  NextKey
 KeyRight:
     cmp  gameState, ST_PLAYING
     jne  NextKey
-    cmp  subX, MAX_COL - SUB_HALF     ; hull ka right tip border ke andar rahe
+    cmp  subX, MAX_COL - SUB_HALF
     jae  NextKey
     inc  subX
     jmp  NextKey
@@ -54,12 +54,6 @@ KeySpace:
     call StartSonar
     jmp  NextKey
 
-; PAUSE and RESUME are MASM reserved words (PAUSE is an x86 instruction and
-; RESUME is the .TRY/.FINALLY operator).  MASM 6.14 tolerated them as labels
-; but the ml.exe shipped with Visual Studio 2022/2026 stops with
-; "error A2008: syntax error", so the labels are named PauseGame /
-; UnpauseGame instead.  Never give a label or variable a bare instruction or
-; directive name.
 KeyPause:
     cmp  gameState, ST_PAUSED
     je   UnpauseGame

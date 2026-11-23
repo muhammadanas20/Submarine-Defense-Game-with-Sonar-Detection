@@ -90,13 +90,11 @@ SonarReady:
     mov  ah, ATTR_HUD
     mov  esi, OFFSET strReady
     call PutString
-; "PauseMessage" was renamed: keep pause/banner label names clear of MASM
-; reserved words (see the note in anas\input.inc).
 DrawPauseBanner:
     cmp  gameState, ST_PAUSED
     jne  ShowKeys
     mov  dh, 12
-    mov  dl, 24                 ; centres the 32-cell banner in 80 columns
+    mov  dl, 24
     mov  ah, ATTR_HUD
     mov  esi, OFFSET strPaused
     call PutString

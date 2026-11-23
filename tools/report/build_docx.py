@@ -1,5 +1,3 @@
-"""Build the final report as a Word .docx that follows the course template."""
-
 from __future__ import annotations
 
 import os
@@ -16,7 +14,7 @@ from docx.shared import Inches, Pt, RGBColor, Emu
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import content  # noqa: E402
+import content
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = content.ROOT
@@ -24,7 +22,6 @@ OUT = os.path.join(ROOT, "docs", "submission")
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 
-# child order required by the WordprocessingML schema (subset we use)
 PPR_ORDER = ["pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr",
              "widowControl", "numPr", "suppressLineNumbers", "pBdr", "shd",
              "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap",
@@ -43,7 +40,6 @@ TRPR_ORDER = ["cnfStyle", "divId", "gridBefore", "gridAfter", "wBefore",
 
 
 def insert_ordered(parent, element, order) -> None:
-    """Insert element into parent at the position the schema requires."""
     tag = element.tag.replace(W, "")
     index = order.index(tag)
     for child in list(parent):
@@ -61,9 +57,6 @@ HDR_FILL = "DCE6F1"
 CODE_FILL = "F5F5F5"
 
 
-# ---------------------------------------------------------------------------
-# low-level helpers
-# ---------------------------------------------------------------------------
 def set_run_font(run, name=BODY_FONT, size=12, bold=None, italic=None,
                  color=TEXT_COLOR):
     run.font.name = name
@@ -138,7 +131,6 @@ TOKEN = re.compile(r"(<b>.*?</b>|<i>.*?</i>)", re.S)
 
 def add_rich(paragraph, text: str, size=12, font=BODY_FONT,
              color=TEXT_COLOR) -> None:
-    """Add text that may contain <b>..</b> and <i>..</i> runs."""
     for piece in TOKEN.split(text):
         if not piece:
             continue
@@ -152,9 +144,6 @@ def add_rich(paragraph, text: str, size=12, font=BODY_FONT,
             set_run_font(paragraph.add_run(piece), font, size, color=color)
 
 
-# ---------------------------------------------------------------------------
-# document setup
-# ---------------------------------------------------------------------------
 def setup(doc: Document) -> None:
     sec = doc.sections[0]
     sec.page_width = Inches(8.27)
@@ -196,7 +185,6 @@ def setup(doc: Document) -> None:
         if rfonts is None:
             rfonts = OxmlElement("w:rFonts")
             rpr.append(rfonts)
-        # theme fonts would override the explicit font in Word
         for attr in ("w:asciiTheme", "w:hAnsiTheme", "w:eastAsiaTheme",
                      "w:cstheme"):
             if rfonts.get(qn(attr)) is not None:
@@ -209,7 +197,6 @@ def setup(doc: Document) -> None:
                 if color.get(qn(attr)) is not None:
                     del color.attrib[qn(attr)]
 
-    # header / footer
     head = sec.header.paragraphs[0]
     head.alignment = WD_ALIGN_PARAGRAPH.LEFT
     set_run_font(head.add_run("EL-2003 COAL Lab  |  Fall 2026  |  "
@@ -224,9 +211,6 @@ def setup(doc: Document) -> None:
     add_field(foot, "PAGE")
 
 
-# ---------------------------------------------------------------------------
-# block renderers
-# ---------------------------------------------------------------------------
 def add_cover(doc: Document) -> None:
     for _ in range(4):
         doc.add_paragraph()
@@ -357,8 +341,8 @@ def add_table(doc: Document, spec: dict) -> None:
     table._tbl.tblPr.append(layout)
     widths = spec["widths"]
     total = sum(widths)
-    limit = 8.27 - 2 * 1.0                 # A4 width less the two 1" margins
-    if total > limit:                      # never spill past the right margin
+    limit = 8.27 - 2 * 1.0
+    if total > limit:
         widths = [w * limit / total for w in widths]
     widths = [Inches(w) for w in widths]
 

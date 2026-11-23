@@ -1,5 +1,4 @@
 .code
-; sonar se hidden mines dikhao
 StartSonar PROC USES eax
     mov  gameState, ST_SONAR
     call GetMseconds

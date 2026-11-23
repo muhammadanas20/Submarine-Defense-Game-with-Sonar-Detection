@@ -64,7 +64,6 @@ InitGame PROC USES eax ecx edi
     ret
 InitGame ENDP
 
-; har frame mein input, update aur draw
 GameLoop PROC
 NextFrame:
     call HandleInput

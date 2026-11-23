@@ -52,8 +52,6 @@ Redraw:
     mov  esi, OFFSET strTitle
     call PrintAt
 
-    ; the real submarine, drawn on the menu the same way as on the field:
-    ; sail centred one row above the 11-cell hull
     mov  eax, ATTR_SUB
     mov  dh, 6
     mov  dl, 38

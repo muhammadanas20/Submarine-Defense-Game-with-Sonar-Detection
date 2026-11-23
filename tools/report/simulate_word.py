@@ -1,11 +1,3 @@
-"""Predict the Word page count of the .docx.
-
-Word's "Multiple 1.15" line spacing on 12 pt Times New Roman means a line
-height of about 15.9 pt, while the PDF uses 13.8 pt.  This script rebuilds the
-same flow at Word's metrics and reports how many body pages the .docx is
-expected to need (the template allows 8 to 15 excluding cover and appendix).
-"""
-
 from __future__ import annotations
 
 import os

@@ -26,27 +26,15 @@ ST_EXIT     = 5
 CH_TORP     = '^'
 CH_BORDER   = '='
 
-; ---------------------------------------------------------------------------
-; Sprite geometry.  The art strings themselves live in alyan\render.inc and
-; are always drawn centred on the object's x, so every sprite must be an odd
-; number of cells wide.  *_HALF is how many cells stick out on each side of
-; the stored x; input, rendering and collision all use these values, so a new
-; design only needs the art string plus the width changed here.
-; The numbers are written out (not derived with /) because MASM constant
-; division can complain about a non-integer result.
-; ---------------------------------------------------------------------------
-SUB_W       = 11      ; '<=-[ooo]-=>'  hull, portholes, propeller, bow
-SUB_HALF    = 5       ; SUB_W / 2
-SAIL_W      = 3       ; '_!_'  conning tower with periscope, one row up
+SUB_W       = 11
+SUB_HALF    = 5
+SAIL_W      = 3
 SAIL_HALF   = 1
-SUB_HIT     = 5       ; |chargeX - subX| that sinks you. The two tapered tip
-                      ; cells on each side are grace, as in the previous build
-CHG_W       = 3       ; '(@)'  falling depth charge
+SUB_HIT     = 5
+CHG_W       = 3
 CHG_HALF    = 1
-MINE_W      = 3       ; '[!]'  hidden mine, only drawn during sonar
-                      ; BuildFrame draws both obstacle arts with CHG_HALF, so
-                      ; MINE_W has to stay equal to CHG_W
-TORP_HIT    = 1       ; |torpX - chargeX| that detonates a charge (= CHG_HALF)
+MINE_W      = 3
+TORP_HIT    = 1
 
 ATTR_TEXT   = lightGray  + (black * 16)
 ATTR_SUB    = lightGreen + (black * 16)
