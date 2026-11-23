@@ -233,7 +233,7 @@ def cover_flowables() -> list:
     ]
     rows = [
         ("Project Title", content.TITLE),
-        ("Group ID", content.GROUP_ID),
+        ("Student IDs", content.STUDENT_IDS),
         ("Group Leader (Name & Roll No.)", "Muhammad Anas  \u2013  25K-0899"),
         ("Member 2 (Name & Roll No.)", "Syed Alyan Hussain  \u2013  25K-0648"),
         ("Member 3 (Name & Roll No.)", "Ali Raza  \u2013  25K-0827"),
@@ -341,7 +341,7 @@ def render(blocks: list) -> list:
 
 
 def build() -> str:
-    path = os.path.join(OUT, f"COAL_FinalReport_{content.SECTION}_GroupID.pdf")
+    path = os.path.join(OUT, content.REPORT_NAME + ".pdf")
     doc = BaseDocTemplate(path, pagesize=A4, leftMargin=MARGIN,
                           rightMargin=MARGIN, topMargin=MARGIN,
                           bottomMargin=MARGIN, title="COAL Final Project Report "

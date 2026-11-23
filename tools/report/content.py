@@ -20,7 +20,6 @@ ASSETS = os.path.join(ROOT, "docs", "submission", "assets")
 
 TITLE = ("Depth Charge: A Real-Time Submarine Defense Game with Sonar "
          "Detection in x86 Assembly using Irvine32")
-GROUP_ID = "___________"
 SECTION = "BCS-3C"
 INSTRUCTOR = "Muhammad Owais"
 SUBMIT_DATE = "23 November 2026"
@@ -30,6 +29,13 @@ MEMBERS = [
     ("Syed Alyan Hussain", "25K-0648", "Member 2"),
     ("Ali Raza", "25K-0827", "Member 3"),
 ]
+
+# all roll numbers in one line for the cover page
+STUDENT_IDS = ", ".join(roll for _name, roll, _role in MEMBERS)
+
+# file names of the two deliverables (no group id any more)
+REPORT_NAME = "COAL_FinalReport_%s" % SECTION
+CODE_ZIP_NAME = "COAL_Code_%s.zip" % SECTION
 
 
 def read(path: str) -> str:
@@ -698,7 +704,7 @@ def appendix() -> list:
         ("p", "The complete source of the submitted project follows, in the same order "
               "as the INCLUDE list in <i>game.asm</i>. The code is reproduced exactly "
               "as it appears in the submitted <i>.zip</i> file "
-              "(COAL_Code_BCS-3C_<GroupID>.zip): one program file, game.asm, which "
+              "(COAL_Code_BCS-3C.zip): one program file, game.asm, which "
               "INCLUDEs the shared files and then the fourteen module files."),
     ]
     for path, desc in SOURCE_FILES:
